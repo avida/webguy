@@ -1,0 +1,150 @@
+<html>
+<head>
+
+	<script src="js/jquery.js"></script>
+	<!-- <script src="_assets/js/index.js"></script> --!>
+	<script src="js/jquery.mobile-1.4.5.min.js"></script>
+	<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.dirItem {
+ color: black !important 
+}
+.fileItem{
+color: green !important
+}
+</style>
+</head>
+<body>
+<div data-role="page" id="main">
+<ul data-role="listview" id="listTable">
+<div data-role="header">
+   VLC
+</div>
+<button  value="Suspend" type="button" id="btn-suspend">Suspend</button>
+<div id="player-info">Info</div>
+<fieldset class="ui-grid-a">
+<div class="ui-block-a"><button  value="Backward" type="button" id="btn-back">Backward</button></div>
+<div class="ui-block-b"><button  value="Forward" type="button" id="btn-forward">Forward</button></div>
+</fieldset>
+<button  value="Pause/Play" type="button" id="btn-pplay">Pause/Play</button>
+<button  value="Browse" type="button" id="btn-browse">Browse</button>
+</div><!-- main page-->
+<div data-role="page" id="browser">
+   <div data-role="header" id="browser-hdr">
+   / 
+   </div>
+   <ul data-role="listview" id="lst-dir">
+   </ul>
+</div> <!-- browser page -->
+<script>
+var title_to_info = {}
+function browseHandle(data){
+   var list = JSON.parse(data)
+   $('#lst-dir').empty()
+   var titles = []
+/*
+   for (p in path){
+      titles.push(path[p]['title'])
+   }*/
+   $('#browser-hdr').text('/'+path.join('/'))
+   if(path.length != 0){
+      $('#lst-dir').append('<li>..</li>')
+   }
+   var dirs = list["dirs"]
+   var files = list["files"]
+   title_to_info = {}
+   for (dir in dirs ){
+      var title = dirs[dir]['title']
+      var id = dirs[dir]['id']
+      title_to_info[title] = id
+      var el = $('<li>', { class:'dirItem'}).html(title)
+      $.data(el, 'id', dirs[dir]['id'])
+      $('#lst-dir').append(el)
+      }
+   for (file in files ){
+      var title = files[file]['title']
+      var link = files[file]['link']
+      title_to_info[title] = link
+      $('#lst-dir').append('<li class="fileItem">'+title+'</li>')
+      }
+   $('#lst-dir').listview('refresh')
+   $.mobile.loading("hide")
+}
+
+function itemLoaded(data){
+   $.mobile.loading("hide")
+}
+
+function updateStatus(data){
+   var r = /\\u([\d\w]{4})/gi; 
+   
+   var text = unescape (data.replace(r, function (match, grp) { 
+      return String.fromCharCode(parseInt(grp, 16)); 
+   } ));
+   $("#player-info").html(text)
+}
+
+$("#btn-browse").bind("click", function(event, ui){
+   window.open('#browser', '_self')
+   $.get('srv/browse/', browseHandle)
+})
+
+$("#btn-pplay").bind("click", function(event, ui){
+   $.get('srv/key/space')
+})
+
+$("#btn-forward").bind("click", function(event, ui){
+   $.get('srv/key/shift+Right')
+})
+
+var suspendsent = false;
+$("#btn-suspend").bind("click", function(event, ui){
+   var val = $(this).html().toLowerCase();
+   if (val == 'suspend' && !suspendsent){
+		suspendsent = true
+		$.get('srv/suspend');			
+	}
+})
+
+$("#btn-back").bind("click", function(event, ui){
+   $.get('srv/key/shift+Left')
+})
+
+$(window).on('navigate', function(event, data){
+   event.stopPropagation()
+})
+
+var path = []
+$('#lst-dir').on('click', 'li', function(){
+   var item = $(this).html()
+   var isDir = $(this).is(".dirItem")
+   $.mobile.loading("show",{ 
+      text:item,
+      textVisible:true 
+      })
+   if (item == '..'){
+      path.pop()
+      $.get('srv/browse/'+id , browseHandle)
+      var id = path.length ? path.slice(-1)[0]['id'] : ''
+      $('#lst-dir').empty().listview("refresh")
+      $.get('srv/browse/'+id , browseHandle)
+      return  
+   }
+   if (!isDir){
+      var link = title_to_info[item]
+      $.get('srv/play/?url='+link, itemLoaded)
+   } else {
+      var id = title_to_info[item]
+      path.push({id:id, title:item})
+      $('#lst-dir').empty().listview("refresh")
+      $.get('srv/browse/'+id , browseHandle)
+   }
+})
+
+$(document).ready( function(){
+$.get('srv/vlcinfo',updateStatus);
+});
+</script>
+</body>
+</html>
