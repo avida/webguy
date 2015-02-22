@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import http.client
 from flipflop import WSGIServer
+import html
 import subprocess
 import urllib.parse
 import os
@@ -135,6 +136,7 @@ def app(env, start_resp):
       elif url[0] == "browse":
          try:
             path = urllib.parse.unquote("/".join(url[1:]))
+            path = html.unescape(path)
             return processItemOnFS(start_resp,path)
          except Exception as e:
             return printError(e, start_resp)
