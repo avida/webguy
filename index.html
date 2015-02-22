@@ -82,6 +82,10 @@ function updateStatus(data){
 
 $("#btn-browse").bind("click", function(event, ui){
    window.open('#browser', '_self')
+   $.mobile.loading("show",{ 
+      text:'/',
+      textVisible:true 
+      })
    $.get('srv/browse/', browseHandle)
 })
 
@@ -136,6 +140,8 @@ $('#lst-dir').on('click', 'li', function(){
 
 $(document).ready( function(){
 $.get('srv/vlcinfo',updateStatus);
+if (document.URL.search('#browser')!= -1)
+   $.get('srv/browse/', browseHandle)
 });
 </script>
 </body>
