@@ -71,6 +71,7 @@ def runPlayer(path):
    #runCommand("export DISPLAY=:0;sudo -u dima vlc -f \"%s\" &" % path)
    #runCommand("sudo -u dima totem --fullscreen --display=:0 \"%s\"" % path)
    runCommand("export DISPLAY=:0; sudo -u dima mplayer --fs \"%s\"" % path)
+
 def spawnPlayer(path):
    global player_thread
    if player_thread:
@@ -94,6 +95,7 @@ def processItemOnFS(start_resp, path):
       data = json.dumps({"dirs": dirs, "files": files})
       start_resp('200 OK', [('Content-Type', 'text/plain')])
       return data
+
 def processDLNAData(start_resp, path):
    if not path:
       dirs, files = getDLNAItems()
