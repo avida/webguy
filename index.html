@@ -27,6 +27,7 @@ color: green !important
 <div class="ui-block-a"><button  value="Backward" type="button" id="btn-back">Backward</button></div>
 <div class="ui-block-b"><button  value="Forward" type="button" id="btn-forward">Forward</button></div>
 </fieldset>
+<button  value="Pause/Play" type="button" id="btn-audio">Switch audio</button>
 <button  value="Pause/Play" type="button" id="btn-pplay">Pause/Play</button>
 <button  value="Browse" type="button" id="btn-browse">Browse</button>
 </div><!-- main page-->
@@ -91,6 +92,10 @@ $("#btn-browse").bind("click", function(event, ui){
 
 $("#btn-pplay").bind("click", function(event, ui){
    $.get('srv/key/space')
+})
+
+$("#btn-audio").bind("click", function(event, ui){
+   $.get('srv/key/shift+3')
 })
 
 $("#btn-forward").bind("click", function(event, ui){
