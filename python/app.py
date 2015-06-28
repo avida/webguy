@@ -1,26 +1,23 @@
 #!/usr/bin/python3
 import http.client
-from flipflop import WSGIServer
+#from flipflop import WSGIServer
 import html
-import subprocess
+from utils import runCommand
+from mpc import spawnPlayer, MPCPlayer
 import urllib.parse
 import os
 import sys
 import json
 import threading
+import time
+from wol import WOLThread
 from dlna import getDLNAItems
 
-logfile=open("/home/dima/www/log.txt",'w')
-player_thread = None
-
+logfile=open("./log.txt",'w')
+mpc = MPCPlayer()
 def Log(msg):
   logfile.write(msg+'\n')
   logfile.flush()
-
-def runCommand(cmd):
-  Log(cmd)
-  p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=True)
-  return p.communicate()
 
 def printError(e, start_resp):
    start_resp('200 OK', [('Content-Type', 'text/plain')])
@@ -67,35 +64,28 @@ def getVLCInfo(data=None):
    return json.dumps({"filename": filename, "volume": volume,\
                      "length": length, "position":position } )
 
-def runPlayer(path):
-   Log("run player")
-   #runCommand("export DISPLAY=:0;sudo -u dima vlc -f \"%s\" &" % path)
-   #runCommand("sudo -u dima totem --fullscreen --display=:0 \"%s\"" % path)
-   runCommand("export DISPLAY=:0; sudo -u dima mplayer --fs \"%s\"" % path)
-
-def spawnPlayer(path):
-   global player_thread
-   if player_thread:
-      runCommand("sudo -u dima pkill -9 mplayer")
-   player_thread = threading.Thread(target=runPlayer, args=(path, ))
-   player_thread.start()
-
 def processItemOnFS(start_resp, path):
-   base_path='/mnt/share'
-   full_path = "%s/%s" % (base_path, path)
+   base_path=r'\\192.168.1.115\share'
+   full_path = "%s\%s" % (base_path, path)
    Log("request "+ full_path)
-   if os.path.isfile(full_path):
-      Log("is file")
-      spawnPlayer(full_path)
-      start_resp('200 OK', [('Content-Type', 'text/plain')])
-      return "" 
-   else:
-      dirs, files = getDirsAndFiles(full_path);
-      dirs.sort()
-      files.sort()
-      data = json.dumps({"dirs": dirs, "files": files})
-      start_resp('200 OK', [('Content-Type', 'text/plain')])
-      return data
+   wolthread = WOLThread()
+   wolthread.start()
+   try:
+      if os.path.isfile(full_path):
+         Log("is file")
+         spawnPlayer(full_path)
+         start_resp('200 OK', [('Content-Type', 'text/plain')])
+         return "" 
+      else:
+         dirs, files = getDirsAndFiles(full_path);
+         dirs.sort()
+         files.sort()
+         data = json.dumps({"dirs": dirs, "files": files})
+         start_resp('200 OK', [('Content-Type', 'text/plain')])
+         return data
+   finally:
+      pass
+      wolthread.Stop()
 
 def processDLNAData(start_resp, path):
    if not path:
@@ -105,30 +95,39 @@ def processDLNAData(start_resp, path):
    data = json.dumps({"dirs": dirs, "files": files})
    start_resp('200 OK', [('Content-Type', 'text/plain')])
    return data
-    
+
 def app(env, start_resp):
    url = env.get('REQUEST_URI')
    url = url.split('/')[2:]
    try:
       if "suspend" in url:
          try:
-            data = runCommand('sudo pm-suspend')
+            data = runCommand('rundll32.exe powrprof.dll,SetSuspendState 0,1,0')
             start_resp('200 OK', [('Content-Type', 'text/plain')])
             return str(data)
          except Exception as e:
             printError(e, start_resp)
       elif "forward" in url:
-         data = sendVLCRequest("command=seek&val=+30S")
-         data = getVLCInfo(data)
-         start_resp('200 OK', [('Content-Type', 'text/plain')])
-         return data
+         #data = sendVLCRequest("command=seek&val=+30S")
+         #data = getVLCInfo(data)
+         #start_resp('200 OK', [('Content-Type', 'text/plain')])
+         mpc.jumpFForward()
+         return ''
       elif "backward" in url:
-         data = getVLCInfo(sendVLCRequest("command=seek&val=-30S"))
-         start_resp('200 OK', [('Content-Type', 'text/plain')])
-         return data
-      elif "vlcinfo" in url:
+         #data = getVLCInfo(sendVLCRequest("command=seek&val=-30S"))
+         #start_resp('200 OK', [('Content-Type', 'text/plain')])
+         mpc.jumpBBack()
+         return ''
+      elif "pplay" in url:
+         #data = getVLCInfo(sendVLCRequest('command=pl_pause'))
+         mpc.pplay()
+         return ''
+      elif "audio" in url:
+         mpc.nextAudio()
+         return ""
+      elif "playerinfo" in url:
          try:
-            data = getVLCInfo()
+            data = json.dumps(mpc.getInfo())
             start_resp('200 OK', [('Content-Type', 'text/plain')])
             return data
          except Exception as e:
@@ -152,7 +151,7 @@ def app(env, start_resp):
          out = runCommand("export XAUTHORITY=/home/dima/.Xauthority; export DISPLAY=:0; sudo xdotool key "+key)
          start_resp('200 OK', [('Content-Type', 'text/plain')])
          return out
-      return printenvironent(env, start_resp)
+      return ""
    except Exception as e:
       return printError(e, start_resp)
 
@@ -171,7 +170,4 @@ def printenvironent(env, start_resp):
       yield '<tr><th>%s</th><td>%s</td></tr>' % (k , v)
    yield '</table>'
 
-if len(sys.argv) != 1:
-   pass
-else:
-   WSGIServer(app).run()
+#WSGIServer(app).run()

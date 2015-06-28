@@ -39,7 +39,7 @@ color: green !important
    </ul>
 </div> <!-- browser page -->
 <script>
-var title_to_info = {}
+
 function browseHandle(data){
    var list = JSON.parse(data)
    $('#lst-dir').empty()
@@ -66,6 +66,7 @@ function browseHandle(data){
       }
    $('#lst-dir').listview('refresh')
    $.mobile.loading("hide")
+   $(window).scrollTop(last_position)
 }
 
 function itemLoaded(data){
@@ -74,11 +75,15 @@ function itemLoaded(data){
 
 function updateStatus(data){
    var r = /\\u([\d\w]{4})/gi; 
-   
-   var text = unescape (data.replace(r, function (match, grp) { 
+   var data_struct = JSON.parse(data)
+   var f_name = unescape (data_struct['file'].replace(r, function (match, grp) { 
       return String.fromCharCode(parseInt(grp, 16)); 
    } ));
-   $("#player-info").html(text)
+   $("#player-info").html(f_name + " " +
+                          data_struct['position']+'/'+data_struct['duration'])
+   setTimeout(function(){
+      $.get('srv/playerinfo',updateStatus);
+   }, 3000)
 }
 
 $("#btn-browse").bind("click", function(event, ui){
@@ -87,19 +92,24 @@ $("#btn-browse").bind("click", function(event, ui){
       text:'/',
       textVisible:true 
       })
-   $.get('srv/browse/', browseHandle)
+
+   $.get('srv/browse/'+path.join('/'), browseHandle)
 })
 
 $("#btn-pplay").bind("click", function(event, ui){
-   $.get('srv/key/space')
+   $.get('srv/pplay')
 })
 
 $("#btn-audio").bind("click", function(event, ui){
-   $.get('srv/key/shift+3')
+   $.get('srv/audio')
 })
 
 $("#btn-forward").bind("click", function(event, ui){
-   $.get('srv/key/shift+Right')
+   $.get('srv/forward')
+})
+
+$("#btn-back").bind("click", function(event, ui){
+   $.get('srv/backward')
 })
 
 var suspendsent = false;
@@ -111,15 +121,12 @@ $("#btn-suspend").bind("click", function(event, ui){
 	}
 })
 
-$("#btn-back").bind("click", function(event, ui){
-   $.get('srv/key/shift+Left')
-})
-
 $(window).on('navigate', function(event, data){
    event.stopPropagation()
 })
 
 var path = []
+var last_position = 0
 $('#lst-dir').on('click', 'li', function(){
    var item = $(this).html()
    var isDir = $(this).is(".dirItem")
@@ -133,6 +140,7 @@ $('#lst-dir').on('click', 'li', function(){
       $.get('srv/browse/'+ path.join('/'), browseHandle)
       return  
    }
+   last_position = $(window).scrollTop()
    if (!isDir){
       $.get('srv/browse/'+path.join('/')+'/'+item , itemLoaded)
    } else {
@@ -141,10 +149,11 @@ $('#lst-dir').on('click', 'li', function(){
       $('#lst-dir').empty().listview("refresh")
       $.get('srv/browse/'+path.join('/'), browseHandle)
    }
+
 })
 
 $(document).ready( function(){
-$.get('srv/vlcinfo',updateStatus);
+$.get('srv/playerinfo',updateStatus);
 if (document.URL.search('#browser')!= -1)
    $.get('srv/browse/', browseHandle)
 });
