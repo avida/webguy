@@ -1,6 +1,8 @@
+#!/usr/bin/python3
 import tornado.ioloop
 import tornado.web
-from app import app
+import sys
+app = None
 class Dummy:
     def __call__(self, *kwargs):
         pass
@@ -12,6 +14,14 @@ class MainHandler(tornado.web.RequestHandler):
 class Redirect(tornado.web.RequestHandler):
     def get(self):
         self.render('../page/index.html')
+if sys.argv[1] == 'raspi':
+    import raspi
+    print ("raspi init")
+    app = raspi.app
+else:
+    import app
+    print ("app init")
+    app = app.app
 application = tornado.web.Application(handlers=[
         (r"/srv/(.*)", MainHandler),
         (r"/", Redirect),

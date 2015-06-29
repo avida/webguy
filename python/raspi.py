@@ -12,6 +12,7 @@ import threading
 import time
 from wol import WOLThread
 from dlna import getDLNAItems
+from gpio import RaspiGPIOOut
 
 logfile=open("./log.txt",'w')
 mpc = MPCPlayer()
@@ -31,16 +32,6 @@ def getElementWithId(elements, id_name, id_value):
    for el in elements:
       if el.getAttribute(id_name) == id_value:
          return el
-
-def getVLCInfoFilename(dom):
-   information = dom.documentElement.getElementsByTagName("information")[0]
-   category = getElementWithId(information.getElementsByTagName("category"), "name", "meta")
-   info = getElementWithId(category.getElementsByTagName("info"), "name", "filename")
-   return info.childNodes[0].nodeValue
-
-def getVLCBaseInfo(dom, tag):
-   return dom.documentElement.getElementsByTagName(tag)[0].\
-          childNodes[0].nodeValue
 
 def sendVLCRequest(params=None):
    c = http.client.HTTPConnection("127.0.0.1:8080")
@@ -98,7 +89,7 @@ def processDLNAData(start_resp, path):
 
 def app(env, start_resp):
    url = env.get('REQUEST_URI')
-   url = url.split('/')[2:]
+   url = url.split('/')[2:] # split result: '' , 'srv', 'request itself'
    try:
       if "suspend" in url:
          try:
@@ -113,61 +104,13 @@ def app(env, start_resp):
          #start_resp('200 OK', [('Content-Type', 'text/plain')])
          mpc.jumpFForward()
          return ''
-      elif "backward" in url:
-         #data = getVLCInfo(sendVLCRequest("command=seek&val=-30S"))
-         #start_resp('200 OK', [('Content-Type', 'text/plain')])
-         mpc.jumpBBack()
-         return ''
-      elif "pplay" in url:
-         #data = getVLCInfo(sendVLCRequest('command=pl_pause'))
-         mpc.pplay()
-         return ''
-      elif "audio" in url:
-         mpc.nextAudio()
-         return ""
-      elif "playerinfo" in url:
-         try:
-            data = json.dumps(mpc.getInfo())
-            start_resp('200 OK', [('Content-Type', 'text/plain')])
-            return data
-         except Exception as e:
-            return printError(e, start_resp)
-      elif url[0] == "browse":
-         try:
-            path = urllib.parse.unquote("/".join(url[1:]))
-            path = html.unescape(path)
-            return processItemOnFS(start_resp,path)
-         except Exception as e:
-            return printError(e, start_resp)
-      elif url[0] == "play":
-         qs = env.get('QUERY_STRING')
-         query = urllib.parse.parse_qs(qs)
-         url=query['url'][0]
-         spawnPlayer(url)
-         start_resp('200 OK', [('Content-Type', 'text/plain')])
-         return ""
-      elif url[0] == 'key':
-         key = url[1]
-         out = runCommand("export XAUTHORITY=/home/dima/.Xauthority; export DISPLAY=:0; sudo xdotool key "+key)
-         start_resp('200 OK', [('Content-Type', 'text/plain')])
-         return out
-      return ""
+      elif "socket" in url:
+         s = url[1]
+         val = url[2]
+         print (s," ", val)
+         p = RaspiGPIOOut(int(s))
+         p.setValue(val == "1")
+         return str(p.getValue())
    except Exception as e:
       return printError(e, start_resp)
-
-def printenvironent(env, start_resp):
-   start_resp('200 OK', [('Content-Type', 'text/html')])
-   yield '<h1>Environment<h1>'
-   try:
-      length = int (env.get('CONTENT_LENGTH', '0'))
-      if length:
-         data = env['wsgi.input'].read(length)
-         yield data.decode('ascii')
-   except Exception as e:
-      yield str(e)
-   yield '<table>'
-   for k, v in sorted(env.items()):
-      yield '<tr><th>%s</th><td>%s</td></tr>' % (k , v)
-   yield '</table>'
-
 #WSGIServer(app).run()
