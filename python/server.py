@@ -11,9 +11,14 @@ class MainHandler(tornado.web.RequestHandler):
         env = {'REQUEST_URI': self.request.uri, 
                 'QUERY_STRING':self.request.query}
         self.write(app(env, Dummy() ))
+
 class Redirect(tornado.web.RequestHandler):
     def get(self):
-        self.render('../page/index.html')
+        index_url = "../page/index.html"
+        if sys.argv[1]:
+            index_url = '../page/raspi/index.html'
+        self.render(index_url)
+
 if sys.argv[1] == 'raspi':
     import raspi
     print ("raspi init")
