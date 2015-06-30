@@ -125,6 +125,9 @@ def app(env, start_resp):
       elif "audio" in url:
          mpc.nextAudio()
          return ""
+      elif "fullscreen" in url:
+         mpc.fullscreen()
+         return ""
       elif "playerinfo" in url:
          try:
             data = json.dumps(mpc.getInfo())
@@ -135,7 +138,10 @@ def app(env, start_resp):
       elif url[0] == "browse":
          try:
             path = urllib.parse.unquote("/".join(url[1:]))
-            path = html.unescape(path)
+            try:
+                path = html.unescape(path)
+            except AttributeError:
+                pass
             return processItemOnFS(start_resp,path)
          except Exception as e:
             return printError(e, start_resp)
