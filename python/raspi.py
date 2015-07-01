@@ -105,11 +105,11 @@ def app(env, start_resp):
          mpc.jumpFForward()
          return ''
       elif "socket" in url:
-         s = url[1]
-         val = url[2]
-         print (s," ", val)
+         s = url[2]
          p = RaspiGPIOOut(int(s))
-         p.setValue(val == "1")
+         if not "get" in url:
+            val = url[3]
+            p.setValue(val == "1")
          return str(p.getValue())
    except Exception as e:
       return printError(e, start_resp)
