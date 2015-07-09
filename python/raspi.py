@@ -107,6 +107,10 @@ def app(env, start_resp):
       elif "socket" in url:
          s = url[2]
          p = RaspiGPIOOut(int(s))
+         if "switch" in url:
+            val = p.getValue()
+            p.setValue(not val)
+            return "ok"
          if not "get" in url:
             val = url[3]
             p.setValue(val == "1")

@@ -21,7 +21,9 @@ class Redirect(tornado.web.RequestHandler):
 
 if len(sys.argv) >1 and sys.argv[1] == 'raspi':
     import raspi
+    from  serial_listener import startListen
     print ("raspi init")
+    startListen()
     app = raspi.app
 else:
     import app
