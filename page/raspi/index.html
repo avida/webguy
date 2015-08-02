@@ -25,20 +25,22 @@ color: green !important
    <h1>Raspi</h1>
    <a href="http://192.168.1.117" class="ui-btn-right">VLC</a>
 </div>
-<div>
-<span>Socket 4:</span>
-<input data-role="flipswitch" name="flip-s4" id="flip-s4" type="checkbox">
-</div>
+<ul data-role="listview">
+<li>
+    <div>
+    <span>Socket 4</span>
+    <input data-role="flipswitch" name="flip-s4" id="flip-s4" type="checkbox">
+    </div>
+</li>
+<li>
+    <div>
+    <span>Socket 27</span>
+    <input data-role="flipswitch" name="flip-s27" id="flip-s27" type="checkbox">
+    </div>
+</li>
+</ul>
 </div><!-- main page-->
 <script>
-
-$("#btn-forward").bind("click", function(event, ui){
-   $.get('srv/socket/4/1')
-})
-
-$("#btn-back").bind("click", function(event, ui){
-   $.get('srv/socket/4/0')
-})
 
 $(document).ready( function(){
    $.get('srv/socket/get/4', function(val){
@@ -60,6 +62,16 @@ $(document).ready( function(){
         else
         {
             $.get('srv/socket/set/4/1')
+        }
+    })
+    $('#flip-s27').change(function(){
+        if ($('#flip-s27').is(':checked'))
+        {
+            $.get('srv/socket/set/27/0')
+        }
+        else
+        {
+            $.get('srv/socket/set/27/1')
         }
     })
    })

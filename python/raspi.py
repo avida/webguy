@@ -13,9 +13,14 @@ import time
 from wol import WOLThread
 from dlna import getDLNAItems
 from gpio import RaspiGPIOOut
+from dirble_backend import Dirble
+from mocp import MOCP
 
 logfile=open("./log.txt",'w')
 mpc = MPCPlayer()
+dirble = None
+mocp = None
+
 def Log(msg):
   logfile.write(msg+'\n')
   logfile.flush()
@@ -115,6 +120,46 @@ def app(env, start_resp):
             val = url[3]
             p.setValue(val == "1")
          return str(p.getValue())
+      elif "radio" in url:
+         command = url[1]
+         global dirble
+         if not dirble:
+            dirble = Dirble()
+         if command == "page":
+             value = url[2]
+             dirble.current_page = int(value)
+             page_info = dirble.loadList()
+             pi = [ {"id":x["id"], 
+                     "name": x["name"], 
+                     "country": x["country"],
+                     "up": len(x["streams"]) != 0 } for x in page_info]
+             return str(pi)
+         elif command == "play":
+             value = url[2]
+             station_info = dirble.getStationInfo(int(value))
+             if len(station_info["streams"]) > 0:
+                stream = station_info["streams"][0]["stream"]
+                MOCP.play(stream)
+                return stream
+             return "no stream"
+         elif command == "stop":
+             MOCP.stop()
+             return "stopped"
+         elif command == "info":
+             return MOCP.getCurrentTitle()
+         elif command == "volume":
+             val = url[2]
+             global mocp
+             if not mocp:
+                mocp = MOCP()
+             if val == "up":
+                mocp.volumeUp()
+             elif val == "down":
+                mocp.volumeDown()
+             return str(mocp.vol)
+         return "Unknown command"
+      return "Sorry cannot server this"
+            
    except Exception as e:
       return printError(e, start_resp)
 #WSGIServer(app).run()
