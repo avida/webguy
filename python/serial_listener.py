@@ -5,7 +5,7 @@ import time
 import http.client
 
 COMMAND_INTERVAL = 10
-port = serial.Serial("/dev/ttyAMA0", baudrate=57600)
+port = serial.Serial("/dev/ttyAMA0", baudrate=115200)
 
 def readlineCR(port):
     rv = b''
@@ -50,5 +50,4 @@ def startListen():
     t.start()
     return t
 if __name__ == "__main__":
-    startListen();
-    t.join()
+    startListen().join();
