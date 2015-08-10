@@ -133,7 +133,7 @@ def app(env, start_resp):
                      "name": x["name"], 
                      "country": x["country"],
                      "up": len(x["streams"]) != 0 } for x in page_info]
-             return str(pi)
+             return json.dumps(pi)
          elif command == "play":
              value = url[2]
              station_info = dirble.getStationInfo(int(value))
@@ -156,6 +156,12 @@ def app(env, start_resp):
                 mocp.volumeUp()
              elif val == "down":
                 mocp.volumeDown()
+             elif val == 'set':
+                newval = url[3]
+                MOCP.setVolume(int(newval))
+                return 'ok'
+             elif val == 'get':
+                return str(MOCP.volume())
              return str(mocp.vol)
          return "Unknown command"
       return "Sorry cannot server this"

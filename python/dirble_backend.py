@@ -33,7 +33,7 @@ class DirbleConnection:
         elif resp.status != 200:
             return "{'error':'bad response %d'}" % resp.status
         else:
-            return resp.read().decode("ascii")
+            return resp.read().decode("utf-8")
             
 class Dirble:
     def __init__(self):
@@ -53,7 +53,7 @@ class Dirble:
             if not self.connection:
                 self.connection = DirbleConnection(drible_host)
             return json.loads( self.connection.getData(req) )
-        except http.HTTPException:
+        except http.client.HTTPException:
             self.connection = DirbleConnection(drible_host)
             return []
 
@@ -87,8 +87,5 @@ class Dirble:
 
 if __name__ == "__main__":
     d = Dirble()
+    d.current_page = 1
     print(str(d.loadList()))
-    d.NextPage()
-    lst = d.loadList()
-    for i in lst:
-        print (i["streams"])

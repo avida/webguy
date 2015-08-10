@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 .dirItem {
- color: black !important 
+ color: black !important
 }
 .fileItem{
 color: green !important
@@ -39,8 +39,75 @@ color: green !important
     </div>
 </li>
 </ul>
+<label for="vol-slider">Volume:</label>
+<input name="volume-slider" id="vol-slider" min="0" max="100" value="50" type="range" data-highlight="true">
+<button  value="Radio" type="button" id="btn-stations">Radio</button>
+<button  value="Radio" type="button" id="btn-stop">Stop</button>
+
 </div><!-- main page-->
+
+<div data-role="page" id="stations">
+   <div data-role="header" id="stations-hdr">
+   Dirble
+   </div>
+   <ul data-role="listview" id="lst-stations">
+   </ul>
+<fieldset class="ui-grid-a">
+<div class="ui-block-a"><button  type="button" id="btn-prev">Prev</button></div>
+<div class="ui-block-b"><button  type="button" id="btn-next">Next</button></div>
+</fieldset>
+</div> <!-- stations page -->
+
 <script>
+
+var current_page = 1
+function stationsLoaded(data)
+{
+   try{
+   var stations = JSON.parse(data)
+    }
+    catch(e)
+    {
+       window.alert(e.message + "\n Data:\n" + data)
+       return
+    }
+   $('#lst-stations').empty()
+   $('#stations-hdr').text('Page ' + current_page)
+   for (station in stations)
+   {
+      var title = stations[station]['name']
+      var st_id = stations[station]['id']
+      $('#lst-stations').append('<li class="station" st_id="'+st_id+'">'
+                                 + title +
+                                '</li>')
+   }
+   $('#lst-stations').listview('refresh')
+}
+$('#lst-stations').on('click', 'li', function(){
+   var item = $(this).html()
+    var st_id = this.getAttribute('st_id')
+    $.get('srv/radio/play/' + st_id )
+
+})
+
+$('#btn-stations').bind('click', function(event, ui){
+   window.open('#stations', '_self')
+   $.get('srv/radio/page/'+current_page, stationsLoaded)
+
+})
+
+$('#btn-prev').bind('click', function(event, ui){
+    if(current_page > 1){
+        $.get('srv/radio/page/' + --current_page, stationsLoaded)
+    }
+})
+$('#btn-next').bind('click', function(event, ui){
+    $.get('srv/radio/page/' + ++current_page, stationsLoaded)
+})
+
+$('#btn-stop').bind('click', function(event, ui){
+    $.get('srv/radio/stop')
+})
 
 $(document).ready( function(){
    $.get('srv/socket/get/4', function(val){
@@ -75,6 +142,18 @@ $(document).ready( function(){
         }
     })
    })
+    $.get('srv/radio/volume/get', function(val){
+
+       var slider = $('#vol-slider')
+       slider.val(val)
+       slider.slider('refresh')
+
+       $('#vol-slider').on('slidestop', function(event,ui){
+           $.get('srv/radio/volume/set/' + slider.val())
+       })
+
+    })
+
 });
 </script>
 </body>
