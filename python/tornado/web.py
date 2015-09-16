@@ -1646,7 +1646,6 @@ class Application(httputil.HTTPServerConnectionDelegate):
                 self.transforms.append(GZipContentEncoding)
         else:
             self.transforms = transforms
-        print('init2')
         self.handlers = []
         self.named_handlers = {}
         self.default_host = default_host

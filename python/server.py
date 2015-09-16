@@ -2,15 +2,6 @@
 import tornado.ioloop
 import tornado.web
 import sys
-app = None
-class Dummy:
-    def __call__(self, *kwargs):
-        pass
-class MainHandler(tornado.web.RequestHandler):
-    def get(self, *args):
-        env = {'REQUEST_URI': self.request.uri, 
-                'QUERY_STRING':self.request.query}
-        self.write(app(env, Dummy() ))
 
 class Redirect(tornado.web.RequestHandler):
     def get(self):
@@ -19,18 +10,37 @@ class Redirect(tornado.web.RequestHandler):
             index_url = '../page/raspi/index.html'
         self.render(index_url)
 
-if len(sys.argv) >1 and sys.argv[1] == 'raspi':
-    import raspi
-    from  serial_listener import startListen
+class RaspiMainHandler(tornado.web.RequestHandler):
+    def __init__(self):
+        import raspi
+        self.app = raspi.App()
+    def get(self, *args):
+        print ("get")
+        self.write(self.app.processRequest(self))
+
+class MainHandler(tornado.web.RequestHandler):
+    def __init__(self, request, handler_kwargs):
+        tornado.web.RequestHandler.__init__(self, request, handler_kwargs)
+        import app
+        self.app = app.App()
+    def get(self, *args):
+        print ("get")
+        self.write(self.app.processRequest(self))
+
+handler_class = MainHandler
+if 'raspi' in sys.argv:
     print ("raspi init")
-    startListen()
-    app = raspi.app
+    try:
+        from  serial_listener import startListen
+        startListen()
+    except:
+        print ("No serial module")
+    handler_class = RaspiMainHandler
 else:
-    import app
-    print ("app init")
-    app = app.app
+    print ("main hanlder")
+
 application = tornado.web.Application(handlers=[
-        (r"/srv/(.*)", MainHandler),
+        (r"/srv/(.*)", handler_class),
         (r"/", Redirect),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path":"../page"}),
         ])
