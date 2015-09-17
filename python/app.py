@@ -28,11 +28,9 @@ class TestHandler:
 class BrowserHanlder:
    def __call__(self, params):
       try:
-         path = '/'.join(params)
+         path = urllib.parse.unquote('/'.join(params))
          path = html.unescape(path)
-         print (path)
-         return path
-         return self.processItemOnFS();
+         return self.processItemOnFS(path);
       except AttributeError:
          pass
    def getDirsAndFiles(path):
@@ -47,7 +45,6 @@ class BrowserHanlder:
       wolthread.start()
       try:
          if os.path.isfile(full_path):
-            Log("is file")
             spawnPlayer(full_path)
             return "" 
          else:
@@ -74,16 +71,16 @@ class MPCRequestHandler:
             start_resp('200 OK', [('Content-Type', 'text/plain')])
             return ""
          elif "backward" in params:
-            mpc.jumpBBack()
+            self.mpc.jumpBBack()
          elif "pplay" in params:
-            mpc.pplay()
+            self.mpc.pplay()
          elif "audio" in params:
-            mpc.nextAudio()
+            self.mpc.nextAudio()
          elif "fullscreen" in params:
-            mpc.fullscreen()
+            self.mpc.fullscreen()
          elif "playerinfo" in params:
             try:
-               data = json.dumps(mpc.getInfo())
+               data = json.dumps(self.mpc.getInfo())
                start_resp('200 OK', [('Content-Type', 'text/plain')])
                return data
             except Exception as e:
@@ -92,7 +89,6 @@ class MPCRequestHandler:
 
 class SystemRequestHandler:
    def __call__(self, params):
-      print (str(params))
       if "suspend" in params:
          try:
             data = runCommand('rundll32.exe powrprof.dll,SetSuspendState 0,1,0')
@@ -111,16 +107,8 @@ class App:
       self.dispatcher = url_handler.UrlDispatcher()
       self.dispatcher.addHandler('/srv/test', TestHandler());
       self.dispatcher.addHandler('/srv/browse', BrowserHanlder());
-      hndlr = MPCRequestHandler()
-      self.dispatcher.addHandler('/srv/forward', hndlr);
-      self.dispatcher.addHandler('/srv/backward', hndlr);
-      self.dispatcher.addHandler('/srv/pplay', hndlr);
-      self.dispatcher.addHandler('/srv/fullscreen', hndlr);
-      self.dispatcher.addHandler('/srv/playerinfo', hndlr);
-      self.dispatcher.addHandler('/srv/audio', hndlr);
-      hndlr = SystemRequestHandler()
-      self.dispatcher.addHandler('/srv/suspend', hndlr);
-      self.dispatcher.addHandler('/srv/key', hndlr);
+      self.dispatcher.addHandler('/srv/player', MPCRequestHandler())
+      self.dispatcher.addHandler('/srv/system', SystemRequestHandler());
 
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)

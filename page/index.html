@@ -89,7 +89,7 @@ function updateStatus(data){
    $("#player-info").html(f_name + " " +
                           data_struct['position']+'/'+data_struct['duration'])
    setTimeout(function(){
-      $.get('srv/playerinfo',updateStatus);
+      $.get('srv/player/playerinfo',updateStatus);
    }, 3000)
 }
 
@@ -104,23 +104,23 @@ $("#btn-browse").bind("click", function(event, ui){
 })
 
 $("#btn-pplay").bind("click", function(event, ui){
-   $.get('srv/pplay')
+   $.get('srv/player/pplay')
 })
 
 $("#btn-audio").bind("click", function(event, ui){
-   $.get('srv/audio')
+   $.get('srv/player/audio')
 })
 
 $("#btn-fullscreen").bind("click", function(event, ui){
-   $.get('srv/fullscreen')
+   $.get('srv/player/fullscreen')
 })
 
 $("#btn-forward").bind("click", function(event, ui){
-   $.get('srv/forward')
+   $.get('srv/player/forward')
 })
 
 $("#btn-back").bind("click", function(event, ui){
-   $.get('srv/backward')
+   $.get('srv/player/backward')
 })
 
 var suspendsent = false;
@@ -128,7 +128,7 @@ $("#btn-suspend").bind("click", function(event, ui){
    var val = $(this).html().toLowerCase();
    if (val == 'suspend' && !suspendsent){
 		suspendsent = true
-		$.get('srv/suspend');			
+		$.get('srv/system/suspend');			
 	}
 })
 
