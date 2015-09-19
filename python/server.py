@@ -11,7 +11,8 @@ class Redirect(tornado.web.RequestHandler):
         self.render(index_url)
 
 class RaspiMainHandler(tornado.web.RequestHandler):
-    def __init__(self):
+    def __init__(self, request, handler_kwargs):
+        tornado.web.RequestHandler.__init__(self, request, handler_kwargs)
         import raspi
         self.app = raspi.App()
     def get(self, *args):

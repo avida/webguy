@@ -4,7 +4,7 @@ import threading
 import time
 import http.client
 
-COMMAND_INTERVAL = 10
+COMMAND_INTERVAL = 5
 port = serial.Serial("/dev/ttyAMA0", baudrate=115200)
 
 def readlineCR(port):
