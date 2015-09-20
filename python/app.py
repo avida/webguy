@@ -2,7 +2,7 @@
 import http.client
 #from flipflop import WSGIServer
 import html
-from utils import runCommand
+from utils import runCommand, FileBrowser
 from mpc import spawnPlayer, MPCPlayer
 import urllib.parse
 import os
@@ -25,7 +25,10 @@ class TestHandler:
    def __call__(self, params):
       return "testddd " +  str(params)
 
-class BrowserHanlder:
+class BrowserHanlder(FileBrowser):
+   def __init__(self):
+      FileBrowser.__init__(self,'\\192.168.1.115\share', True)
+
    def __call__(self, params):
       try:
          path = urllib.parse.unquote('/'.join(params))
@@ -33,30 +36,10 @@ class BrowserHanlder:
          return self.processItemOnFS(path);
       except AttributeError:
          pass
-   def getDirsAndFiles(path):
-      _, d, f = next(os.walk(path))
-      return d, f
+      except FileBrowser.NotADirException:
+         spawnPlayer('/'.join(params))
+         return "ok"
 
-   def processItemOnFS(self, path):
-      base_path=r'\\192.168.1.115\share'
-      full_path = "%s\%s" % (base_path, path)
-      Log("request "+ full_path)
-      wolthread = WOLThread()
-      wolthread.start()
-      try:
-         if os.path.isfile(full_path):
-            spawnPlayer(full_path)
-            return "" 
-         else:
-            dirs, files = BrowserHanlder.getDirsAndFiles(full_path);
-            dirs.sort()
-            files.sort()
-            data = json.dumps({"dirs": dirs, "files": files})
-            return data
-      finally:
-         pass
-         wolthread.Stop()
-      #return processItemOnFS(start_resp,path)
 class MPCRequestHandler:
    def __init__(self):
          self.mpc = MPCPlayer()

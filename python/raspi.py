@@ -10,6 +10,8 @@ from gpio import RaspiGPIOOut
 from dirble_backend import Dirble
 from mocp import MOCP
 import url_handler
+from utils import FileBrowser
+from omxplayer import  OMXPlayer
 
 mocp = None
 class RadioHandler:
@@ -74,12 +76,49 @@ class SocketHandler:
         elif command == 'get':
            return str(p.getValue())
         return "Unknown command"
+
+class BrowserHanlder(FileBrowser):
+   def __init__(self, app):
+      self.app = app
+      FileBrowser.__init__(self,'/root/share')
+
+   def __call__(self, params):
+      try:
+         path = urllib.parse.unquote('/'.join(params))
+         path = html.unescape(path)
+         return self.processItemOnFS(path);
+      except AttributeError:
+         pass
+      except FileBrowser.NotADirException:
+         path = self.dir_path + '/'+ path
+         print (path)
+         self.app.player.quitPlayer()
+         self.app.player.startPlayer(path)
+      return "ok"
+
+class PlayerHandler:
+   def __init__(self, app):
+      self.app = app
+
+   def __call__(self, params):
+      command = params[0]
+      if command == "forward":
+         self.app.player.forward()
+      elif command == "pplay":
+         self.app.player.pause()
+      elif command == "backward":
+         self.app.player.backward()
+      elif command == "audio":
+         self.app.player.switchAudio()
+      return "ok"
       
 class App:
    def __init__(self):
+      self.player = OMXPlayer()
       self.dispatcher = url_handler.UrlDispatcher()
       self.dispatcher.addHandler('/srv/radio', RadioHandler());
       self.dispatcher.addHandler('/srv/socket', SocketHandler());
-
+      self.dispatcher.addHandler('/srv/browse', BrowserHanlder(self));
+      self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)

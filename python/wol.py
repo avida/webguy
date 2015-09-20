@@ -14,8 +14,6 @@ import threading
 import time
 BROADCAST_IP = '255.255.255.255'
 DEFAULT_PORT = 9
-celeron = '00:13:D4:CA:9D:C2'
-old_intel = '00:1C:C0:74:4A:09'
 new_intel = '00:1C:C0:05:F2:63'
 class WOLThread(threading.Thread):
    def __init__(self):

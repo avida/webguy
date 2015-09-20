@@ -9,24 +9,30 @@ class Redirect(tornado.web.RequestHandler):
         if len(sys.argv) > 1 and sys.argv[1] == 'raspi':
             index_url = '../page/raspi/index.html'
         self.render(index_url)
-
+web_app = None
 class RaspiMainHandler(tornado.web.RequestHandler):
     def __init__(self, request, handler_kwargs):
         tornado.web.RequestHandler.__init__(self, request, handler_kwargs)
-        import raspi
-        self.app = raspi.App()
+        global web_app
+        if not web_app:
+            import raspi
+            web_app = raspi.App()
     def get(self, *args):
         print ("get")
-        self.write(self.app.processRequest(self))
+        global web_app
+        self.write(web_app.processRequest(self))
 
 class MainHandler(tornado.web.RequestHandler):
     def __init__(self, request, handler_kwargs):
         tornado.web.RequestHandler.__init__(self, request, handler_kwargs)
-        import app
-        self.app = app.App()
+        global web_app
+        if not web_app:
+            import app
+            web_app = app.App()
     def get(self, *args):
         print ("get")
-        self.write(self.app.processRequest(self))
+        global web_app
+        self.write(web_app.processRequest(self))
 
 handler_class = MainHandler
 if 'raspi' in sys.argv:
