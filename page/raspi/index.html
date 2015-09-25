@@ -47,6 +47,7 @@ color: green !important
 
 <button  value="Pause/Play" type="button" id="btn-pplay">Pause/Play</button>
 <button  value="Browse" type="button" id="btn-browse">Browse</button>
+<button  value="Browse" type="button" id="btn-browse-twitch">Browse Games</button>
 <button  value="Radio" type="button" id="btn-stations">Radio</button>
 <button  value="Radio" type="button" id="btn-stop">Stop</button>
 
@@ -70,6 +71,13 @@ color: green !important
    <ul data-role="listview" id="lst-dir" data-filter="true">
    </ul>
 </div> <!-- browser page -->
+<div data-role="page" id="twitch-browser">
+   <div data-role="header" id="twitch-browser-hdr">
+   / 
+   </div>
+   <ul data-role="listview" id="twitch-lst-dir" data-filter="true">
+   </ul>
+</div> <!-- twitch browser page -->
 
 <script>
 <!-- navigation buttons-->
@@ -214,7 +222,38 @@ $("#btn-browse").bind("click", function(event, ui){
 
    $.get('srv/browse/'+path.join('/'), browseHandle)
 })
+<!-- twitch browser -->
+var twitch_page = 0
+function twitchBrowseHandle(data)
+{
+   var list = JSON.parse(data)
+   $('#twitch-lst-dir').empty()
+   for (stream in list ){
+      var title = list[stream][0]
+      var url = list[stream][1]
+      $('#twitch-lst-dir').append('<li class="fileItem" twitch_url="'+url+'">'+title+'</li>')
+      }
+   $('#twitch-lst-dir').listview('refresh')
+   $.mobile.loading("hide")
+   $(window).scrollTop(last_position)
+}
 
+$("#btn-browse-twitch").bind("click", function(event, ui){
+   window.open('#twitch-browser', '_self')
+   $.mobile.loading("show",{ 
+      text:'/',
+      textVisible:true 
+      })
+
+   $.get('srv/twitch/search/starcraft/' + twitch_page, twitchBrowseHandle)
+})
+
+$('#twitch-lst-dir').on('click', 'li', function(){
+   var item = $(this).html()
+    var url = this.getAttribute('twitch_url')
+    $.get('srv/twitch/play/' + url )
+
+})
 <!-- Page section -->
 
 $(document).ready( function(){

@@ -12,6 +12,7 @@ from mocp import MOCP
 import url_handler
 from utils import FileBrowser
 from omxplayer import  OMXPlayer
+from twitch import Twitch
 
 mocp = None
 class RadioHandler:
@@ -111,6 +112,29 @@ class PlayerHandler:
       elif command == "audio":
          self.app.player.switchAudio()
       return "ok"
+
+class TwitchHandler:
+    def __init__(self, app):
+        self.app = app
+        self.twitch = Twitch()
+    def __call__(self, params):
+        command = params[0]
+        if command == "games":
+            try:
+                page = int(params[1])
+            except Exception:
+                page = 0
+            return json.dumps(self.twitch.getGames(page))
+        elif command == "search":
+            game = params[1]
+            page = int(params[2])
+            print ("game = %s page = %d " % (game, page))
+            return json.dumps(self.twitch.searchStreams(game, page))
+        elif command == "play":
+            channel = params[1]
+            self.app.player.quitPlayer()
+            self.app.player.startStream("https://www.twitch.tv/"+channel)
+        return "Ok"
       
 class App:
    def __init__(self):
@@ -120,5 +144,6 @@ class App:
       self.dispatcher.addHandler('/srv/socket', SocketHandler());
       self.dispatcher.addHandler('/srv/browse', BrowserHanlder(self));
       self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
+      self.dispatcher.addHandler('/srv/twitch', TwitchHandler(self));
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)

@@ -16,10 +16,16 @@ class OMXPlayer:
 
     def quitPlayer(self):
         self.sendKey(b'q')
-        time.sleep(5)
+        time.sleep(3)
 
     def pause(self):
         self.sendKey(b'p')
+
+    def startStream(self, url):
+        cmd = "livestreamer --retry-open 3 \"%s\" best --yes-run-as-root --player \"omxplayer\" --fifo" % url
+        print (cmd)
+        self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        
 
     def forward(self):
         # Look for ANSI escape codes here: https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -43,6 +49,12 @@ if __name__ == "__main__":
     print("Run omxplayer module util")
     try:
         player = OMXPlayer()     
+        player.startStream('https://www.youtube.com/watch?v=Le4LsePzn4M')
+        while True:
+            line = player.proc.stdout.readline()
+            if line:
+                print( line )
+        player.startPlayer('/root/Fargo.DVDRip_0dayTeam.avi')
         player.startPlayer('/root/Fargo.DVDRip_0dayTeam.avi')
         time.sleep(10)
         print ("step forward")
@@ -56,6 +68,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print ("exiting player")
         player.quitPlayer()
-
-
     
