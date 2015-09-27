@@ -26,6 +26,7 @@ class ServiceConnection:
                 print("connected")
                 return
             except Exception:
+                print ("reconnecting")
                 retry_count -= 1
         raise ConnectionRetriesiExceeded(self.retries)
 
@@ -34,20 +35,23 @@ class ServiceConnection:
         try:
             if not self.c:
                 self.tryToConnect()
-            request_retries = 1
+            request_retries = 3
             while  request_retries:
                 try:
                     self.c.request("GET", req )
                     resp = self.c.getresponse()
                     if resp.status != 200:
-                        print ("bad responce: " + str(resp.status))
-                        return
+                        print ("bad response: " + str(resp.status))
+                        return "Bad response"
                     data = resp.read().decode("utf-8")
                     if withHeaders:
                         return (data, resp.headers())
                     else:
                         return data
-                except http.client.HTTPException:
+                # Broken pipe occures on https connection
+                # Probably due to the python https implementation paticularities
+                except (http.client.HTTPException, BrokenPipeError):
+                    print ("retry request")
                     request_retries -= 1
                     self.tryToConnect()
         except ConnectionRetriesiExceeded:

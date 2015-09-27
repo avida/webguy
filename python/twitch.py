@@ -9,7 +9,7 @@ TWITCH_HOST = "api.twitch.tv"
 
 class Twitch (ServiceConnection):
     def __init__(self):
-        self.items_per_page = 10
+        self.items_per_page = 11
         ServiceConnection.__init__(self, TWITCH_HOST, https=True)
     def getGames(self, page=0):
         js = json.loads(self.getData("/kraken/games/top?limit=%d&offset=%d" %
@@ -18,10 +18,15 @@ class Twitch (ServiceConnection):
         return x
 
     def searchStreams(self, game, page = 0):
-        js = json.loads(self.getData("/kraken/search/streams?q=%s&limit=%d&offset=%d" % 
-                        (urllib.parse.quote(game), self.items_per_page, self.items_per_page * page )))
-        x = [ (x['channel']['display_name'], x['channel']['url'].replace("http://www.twitch.tv/", "")) for x in js["streams"] ]
-        return x
+        data = (self.getData("/kraken/search/streams?q=%s&limit=%d&offset=%d" % 
+               (urllib.parse.quote(game), self.items_per_page, self.items_per_page * page )))
+        try:
+            js = json.loads(data)
+            x = [ (x['channel']['display_name'], x['channel']['url'].replace("http://www.twitch.tv/", "")) for x in js["streams"] ]
+            return x
+        except ValueError as e:
+            print ("Error parsing data: ", str(data))
+            return "None"
 
 if __name__ == "__main__":
     print("Twitch module")

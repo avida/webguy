@@ -12,6 +12,7 @@ class OMXPlayer:
 
     def startPlayer(self, params):
         cmd = "omxplayer \"%s\"" % params
+        print ("starting player: ", cmd )
         self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
 
     def quitPlayer(self):

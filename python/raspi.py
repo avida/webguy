@@ -12,12 +12,14 @@ from mocp import MOCP
 import url_handler
 from utils import FileBrowser
 from omxplayer import  OMXPlayer
+import os.path
 from twitch import Twitch
 
 mocp = None
 class RadioHandler:
-    def __init__(self):
+    def __init__(self, app):
         self.mocp = None
+        self.app = app
         self.dirble = None
 
     def __call__(self, params):
@@ -42,6 +44,7 @@ class RadioHandler:
                return stream
         elif command == "stop":
             MOCP.stop()
+            self.app.player.quitPlayer()
             return "stopped"
         elif command == "info":
             return MOCP.getCurrentTitle()
@@ -91,7 +94,8 @@ class BrowserHanlder(FileBrowser):
       except AttributeError:
          pass
       except FileBrowser.NotADirException:
-         path = self.dir_path + '/'+ path
+         path = os.path.normpath(self.dir_path +'/'+path)
+
          print (path)
          self.app.player.quitPlayer()
          self.app.player.startPlayer(path)
@@ -140,7 +144,7 @@ class App:
    def __init__(self):
       self.player = OMXPlayer()
       self.dispatcher = url_handler.UrlDispatcher()
-      self.dispatcher.addHandler('/srv/radio', RadioHandler());
+      self.dispatcher.addHandler('/srv/radio', RadioHandler(self));
       self.dispatcher.addHandler('/srv/socket', SocketHandler());
       self.dispatcher.addHandler('/srv/browse', BrowserHanlder(self));
       self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
