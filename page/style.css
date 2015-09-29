@@ -1,0 +1,14 @@
+
+.dirItem {
+ color: black !important
+}
+.fileItem{
+color: green !important
+}
+.ui-flipswitch {
+    margin-right: 10px;
+    float: right;
+}
+.game-thumb {
+    padding-top: 10px;
+}

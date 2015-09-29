@@ -6,18 +6,8 @@
 	<script src="js/jquery.mobile-1.4.5.min.js"></script>
 	<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-.dirItem {
- color: black !important
-}
-.fileItem{
-color: green !important
-}
-.ui-flipswitch {
-    margin-right: 10px;
-    float: right;
-}
-</style>
+<script src="./common.js"></script>
+<link rel="stylesheet" type="text/css" href="./style.css">
 </head>
 <body>
 <div data-role="page" id="main">
@@ -71,14 +61,18 @@ color: green !important
    <ul data-role="listview" id="lst-dir" data-filter="true">
    </ul>
 </div> <!-- browser page -->
-<div data-role="page" id="twitch-browser">
+<div data-role="page" id="twitch-browser" data-theme="b">
    <div data-role="header" id="twitch-browser-hdr">
    / 
    </div>
    <ul data-role="listview" id="twitch-lst-dir" data-filter="true">
    </ul>
-</div> <!-- twitch browser page -->
-
+    <fieldset class="ui-grid-a">
+    <div class="ui-block-a"><button  type="button" id="twitch-btn-prev">Prev</button></div>
+    <div class="ui-block-b"><button  type="button" id="twitch-btn-next">Next</button></div>
+    </fieldset>
+    </div> <!-- twitch browser page -->
+<script src="./raspi/script.js"></script>
 <script>
 <!-- navigation buttons-->
 
@@ -221,38 +215,6 @@ $("#btn-browse").bind("click", function(event, ui){
       })
 
    $.get('srv/browse/'+path.join('/'), browseHandle)
-})
-<!-- twitch browser -->
-var twitch_page = 0
-function twitchBrowseHandle(data)
-{
-   var list = JSON.parse(data)
-   $('#twitch-lst-dir').empty()
-   for (stream in list ){
-      var title = list[stream][0]
-      var url = list[stream][1]
-      $('#twitch-lst-dir').append('<li class="fileItem" twitch_url="'+url+'">'+title+'</li>')
-      }
-   $('#twitch-lst-dir').listview('refresh')
-   $.mobile.loading("hide")
-   $(window).scrollTop(last_position)
-}
-
-$("#btn-browse-twitch").bind("click", function(event, ui){
-   window.open('#twitch-browser', '_self')
-   $.mobile.loading("show",{ 
-      text:'/',
-      textVisible:true 
-      })
-
-   $.get('srv/twitch/search/starcraft/' + twitch_page, twitchBrowseHandle)
-})
-
-$('#twitch-lst-dir').on('click', 'li', function(){
-   var item = $(this).html()
-    var url = this.getAttribute('twitch_url')
-    $.get('srv/twitch/play/' + url )
-
 })
 <!-- Page section -->
 

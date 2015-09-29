@@ -14,7 +14,9 @@ class Twitch (ServiceConnection):
     def getGames(self, page=0):
         js = json.loads(self.getData("/kraken/games/top?limit=%d&offset=%d" %
                         (self.items_per_page, page * self.items_per_page )))
-        x = [ (x["game"]["name"], x["viewers"]) for x in js["top"] ]
+        x = [ (x["game"]["name"], 
+               x["viewers"],
+               x["game"]["box"]["small"]) for x in js["top"] ]
         return x
 
     def searchStreams(self, game, page = 0):
@@ -22,7 +24,11 @@ class Twitch (ServiceConnection):
                (urllib.parse.quote(game), self.items_per_page, self.items_per_page * page )))
         try:
             js = json.loads(data)
-            x = [ (x['channel']['display_name'], x['channel']['url'].replace("http://www.twitch.tv/", "")) for x in js["streams"] ]
+            x = [ (x['channel']['display_name'], 
+                   x['channel']['url'].replace("http://www.twitch.tv/", ""),
+                   x['preview']['small'],
+                   x['viewers']
+                   ) for x in js["streams"] ]
             return x
         except ValueError as e:
             print ("Error parsing data: ", str(data))
