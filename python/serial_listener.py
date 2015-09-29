@@ -27,13 +27,23 @@ class CommandProcessor:
             if elapsed >= COMMAND_INTERVAL:
                 if self.processFunc(cmd):
                     self.last = time.time()
+    def sendRequest(self, req):
+        con = http.client.HTTPConnection('127.0.0.1')
+        con.request("GET", req)
+        r = con.getresponse()
 
     def processFunc(self, cmd):
         if 'ff000f' in cmd:
-            con = http.client.HTTPConnection('127.0.0.1')
-            con.request("GET", "/srv/socket/switch/4")
-            r = con.getresponse()
+            self.sendRequest("/srv/socket/switch/4")
             return True
+        elif '6509af' in cmd:
+            self.sendRequest("/srv/player/forward")
+        elif 'd002ff' in cmd:
+            self.sendRequest("/srv/player/pplay")
+        elif 'e501af' in cmd:
+            self.sendRequest("/srv/player/backward")
+        elif '9f060f' in cmd:
+            self.sendRequest("/srv/radio/stop")
         return False
     
 class UARTThread(threading.Thread):
