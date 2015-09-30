@@ -20,8 +20,8 @@ class Twitch (ServiceConnection):
         return x
 
     def searchStreams(self, game, page = 0):
-        data = (self.getData("/kraken/search/streams?q=%s&limit=%d&offset=%d" % 
-               (urllib.parse.quote(game), self.items_per_page, self.items_per_page * page )))
+        data = (self.getData("/kraken/streams?game=%s&limit=%d&offset=%d" % 
+               (game, self.items_per_page, self.items_per_page * page )))
         try:
             js = json.loads(data)
             x = [ (x['channel']['display_name'], 
