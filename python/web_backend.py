@@ -30,7 +30,7 @@ class ServiceConnection:
                 retry_count -= 1
         raise ConnectionRetriesiExceeded(self.retries)
 
-    def getData(self, req, withHeaders = False): 
+    def getData(self, req, withHeaders = False, headers = None, data = None): 
         print (req)
         try:
             if not self.c:
@@ -38,7 +38,13 @@ class ServiceConnection:
             request_retries = 3
             while  request_retries:
                 try:
-                    self.c.request("GET", req )
+                    if data:
+                        self.c.request("POST", req, body=data, headers=headers )
+                    else:
+                        if headers:
+                           self.c.request("GET", req, headers=headers)
+                        else:
+                           self.c.request("GET", req)
                     resp = self.c.getresponse()
                     if resp.status != 200:
                         print ("bad response: " + str(resp.status))

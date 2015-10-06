@@ -14,6 +14,7 @@ from utils import FileBrowser
 from omxplayer import  OMXPlayer
 import os.path
 from twitch import Twitch
+from xbmc import XBMC
 
 mocp = None
 class RadioHandler:
@@ -40,6 +41,7 @@ class RadioHandler:
             station_info = self.dirble.getStationInfo(int(value))
             if len(station_info["streams"]) > 0:
                stream = station_info["streams"][0]["stream"]
+               self.app.xbmc.Open(stream)
                MOCP.play(stream)
                return stream
         elif command == "stop":
@@ -84,7 +86,7 @@ class SocketHandler:
 class BrowserHanlder(FileBrowser):
    def __init__(self, app):
       self.app = app
-      FileBrowser.__init__(self,'/root/share')
+      FileBrowser.__init__(self,'/mnt/nfs')
 
    def __call__(self, params):
       try:
@@ -97,8 +99,7 @@ class BrowserHanlder(FileBrowser):
          path = os.path.normpath(self.dir_path +'/'+path)
 
          print (path)
-         self.app.player.quitPlayer()
-         self.app.player.startPlayer(path)
+         self.app.xbmc.Open(path)
       return "ok"
 
 class PlayerHandler:
@@ -136,13 +137,12 @@ class TwitchHandler:
             return json.dumps(self.twitch.searchStreams(game, page))
         elif command == "play":
             channel = params[1]
-            self.app.player.quitPlayer()
-            self.app.player.startStream("https://www.twitch.tv/"+channel)
+            self.app.xbmc.openTwitchStream(channel)
         return "Ok"
       
 class App:
    def __init__(self):
-      self.player = OMXPlayer()
+      self.xbmc = XBMC()
       self.dispatcher = url_handler.UrlDispatcher()
       self.dispatcher.addHandler('/srv/radio', RadioHandler(self));
       self.dispatcher.addHandler('/srv/socket', SocketHandler());
