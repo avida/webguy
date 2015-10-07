@@ -57,7 +57,6 @@ $('#twitch-lst-dir').on('click', 'li', function(){
       var url = this.getAttribute('twitch_url')
       $.get('srv/twitch/play/' + url )
    }
-
 })
 
 $('#twitch-btn-next').bind('click', function(event, ui){
@@ -90,5 +89,43 @@ $('#twitch-btn-prev').bind('click', function(event, ui){
         $.get(format('srv/twitch/search/%s/%s', [current_game, twitch_page]), twitchStreamHandle )
     }
 })
+//-----------------Youtube staff -------------------------//
+$('#btn-youtube').bind('click',function(event, ui){
+    window.open('#youtube-page', '_self')  
 
+})
+
+function searchDone(data)
+{
+    var list = JSON.parse(data)
+    $('#youtube-search-res').empty()
+   for (item in list ){
+      var video_id = list[item][0]
+      var title = list[item][1]
+      var image = list[item][2]
+      $('#youtube-search-res').append(format('<li class="video" videoId="%s" ><img class="game-thumb" src="%s">%s</li>', [video_id, image, title ]))
+      }
+   $('#youtube-search-res').listview('refresh')
+}
+
+function itemOpened(data)
+{
+  $.mobile.loading("hide")
+}
+
+$('#youtube-search-res').on('click', 'li', function(){
+   var item = $(this).html()
+   var video_id  = this.getAttribute('videoId')
+   $.mobile.loading("show",{ 
+      text:'Opening video',
+      textVisible:true 
+      })
+   $.get('srv/youtube/play/'+video_id, itemOpened)
+})
+
+$("#search-form").on("submit", function(){
+    var val  =  $("#video-search").val()
+    $.get('srv/youtube/search/'+val, searchDone)
+    return false
+})
 

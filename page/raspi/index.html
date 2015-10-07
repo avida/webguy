@@ -1,10 +1,10 @@
 <html>
 <head>
 
-	<script src="js/jquery.js"></script>
-	<!-- <script src="_assets/js/index.js"></script> --!>
-	<script src="js/jquery.mobile-1.4.5.min.js"></script>
-	<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
+<script src="js/jquery.js"></script>
+<!-- <script src="_assets/js/index.js"></script> -->
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./common.js"></script>
 <link rel="stylesheet" type="text/css" href="./style.css">
@@ -39,7 +39,8 @@
 <button  value="Browse" type="button" id="btn-browse">Browse</button>
 <button  value="Browse" type="button" id="btn-browse-twitch">Browse Games</button>
 <button  value="Radio" type="button" id="btn-stations">Radio</button>
-<button  value="Radio" type="button" id="btn-stop">Stop</button>
+<button  value="Stop" type="button" id="btn-stop">Stop</button>
+<button  value="Youtube" type="button" id="btn-youtube">Youtube</button>
 
 </div><!-- main page-->
 
@@ -61,6 +62,7 @@
    <ul data-role="listview" id="lst-dir" data-filter="true">
    </ul>
 </div> <!-- browser page -->
+
 <div data-role="page" id="twitch-browser" data-theme="b">
    <div data-role="header" id="twitch-browser-hdr">
    / 
@@ -72,6 +74,26 @@
     <div class="ui-block-b"><button  type="button" id="twitch-btn-next">Next</button></div>
     </fieldset>
     </div> <!-- twitch browser page -->
+  <script>
+<div data-role="page" id="youtube-page" data-theme="a">
+   <div data-role="header" id="youtube-hdr">
+   / 
+   </div>
+   <form lpformnum="1" id="search-form">
+       <label for="video-search">Search:</label>
+       <input name="video-search" id="video-search" value="" type="search">
+   </form>
+   <ul data-role="listview" id="youtube-search-res">
+   </ul>
+    <fieldset class="ui-grid-a">
+    <!--
+    <div class="ui-block-a"><button  type="button" id="youtube-btn-prev">Prev</button></div>
+    <div class="ui-block-b"><button  type="button" id="youtube-btn-next">Next</button></div>
+    </fieldset>
+    -->
+    </div> <!-- youtube browser page -->
+
+
 <script src="./raspi/script.js"></script>
 <script>
 <!-- navigation buttons-->
@@ -213,7 +235,6 @@ $("#btn-browse").bind("click", function(event, ui){
       text:'/',
       textVisible:true 
       })
-
    $.get('srv/browse/'+path.join('/'), browseHandle)
 })
 <!-- Page section -->

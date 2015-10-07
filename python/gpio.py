@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    print ("Cannot import GPIO")
 PORT = 4
 class RaspiGPIOOut:
     def __init__(self, port):

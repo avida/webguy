@@ -15,6 +15,7 @@ from omxplayer import  OMXPlayer
 import os.path
 from twitch import Twitch
 from xbmc import XBMC
+from youtube import YouTube
 
 mocp = None
 class RadioHandler:
@@ -139,7 +140,32 @@ class TwitchHandler:
             channel = params[1]
             self.app.xbmc.openTwitchStream(channel)
         return "Ok"
-      
+
+class YouTubeHandler:
+    def __init__(self, app):
+        self.app = app
+        self.yt = YouTube()
+
+    def __call__(self, params):
+        command = params[0]
+        if command == "search":
+            val = urllib.parse.unquote(params[1])
+            try:
+                js = self.yt.search(val)
+            except Exception:
+                return "not ok"
+            items = [ [x["id"]["videoId"],
+                       x["snippet"]["title"],
+                       x["snippet"]["thumbnails"]["medium"]["url"]]  for x in js["items"] if x ["id"]["kind"] == "youtube#video" ]
+            result = json.dumps(items, indent=1)
+            return result
+        elif command == "play":
+            try:
+                self.app.player.openYoutubeVideo(params[1])
+                return "ok"
+            except IndexError:
+                return "not ok"
+        return "Not found"
 class App:
    def __init__(self):
       self.xbmc = XBMC()
@@ -149,5 +175,6 @@ class App:
       self.dispatcher.addHandler('/srv/browse', BrowserHanlder(self));
       self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
       self.dispatcher.addHandler('/srv/twitch', TwitchHandler(self));
+      self.dispatcher.addHandler('/srv/youtube', YouTubeHandler(self));
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)
