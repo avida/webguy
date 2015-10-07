@@ -95,6 +95,7 @@ $('#btn-youtube').bind('click',function(event, ui){
 
 })
 
+
 function searchDone(data)
 {
     var list = JSON.parse(data)
@@ -103,7 +104,9 @@ function searchDone(data)
       var video_id = list[item][0]
       var title = list[item][1]
       var image = list[item][2]
-      $('#youtube-search-res').append(format('<li class="video" videoId="%s" ><img class="game-thumb" src="%s">%s</li>', [video_id, image, title ]))
+      var date_exp = /(.*)T.*/g
+      var date = date_exp.exec(list[item][3])[1]
+      $('#youtube-search-res').append(format('<li class="video" videoId="%s" ><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [video_id, image, title, date ]))
       }
    $('#youtube-search-res').listview('refresh')
 }

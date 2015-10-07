@@ -156,12 +156,13 @@ class YouTubeHandler:
                 return "not ok"
             items = [ [x["id"]["videoId"],
                        x["snippet"]["title"],
-                       x["snippet"]["thumbnails"]["medium"]["url"]]  for x in js["items"] if x ["id"]["kind"] == "youtube#video" ]
+                       x["snippet"]["thumbnails"]["medium"]["url"],
+                       x["snippet"]["publishedAt"]  ] for x in js["items"] if x ["id"]["kind"] == "youtube#video" ]
             result = json.dumps(items, indent=1)
             return result
         elif command == "play":
             try:
-                self.app.player.openYoutubeVideo(params[1])
+                self.app.xbmc.openYoutubeVideo(params[1])
                 return "ok"
             except IndexError:
                 return "not ok"
