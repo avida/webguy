@@ -1,0 +1,30 @@
+#!/bin/bash
+
+WEBGUY_PATH="/home/xbian/webguy/"
+WEBGUY_WD=$WEBGUY_PATH/python
+
+do_start()
+{
+  echo "Starting service"
+  cd $WEBGUY_WD
+  ./server.py raspi &
+}
+
+do_stop()
+{
+   echo "Stopping service"
+   pkill -9 server.py
+}
+
+case "$1" in 
+   start)
+      do_start
+   ;;
+   stop)
+   do_stop
+   ;;
+   restart)
+   do_stop
+   do_start
+   ;;
+esac

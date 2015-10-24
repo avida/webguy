@@ -110,13 +110,18 @@ class PlayerHandler:
    def __call__(self, params):
       command = params[0]
       if command == "forward":
-         self.app.player.forward()
+         self.app.xbmc.Seek("smallforward")
       elif command == "pplay":
-         self.app.player.pause()
+         self.app.xbmc.PlayPause()
       elif command == "backward":
-         self.app.player.backward()
+         self.app.xbmc.Seek("smallbackward")
       elif command == "audio":
          self.app.player.switchAudio()
+      elif command == "info":
+         return json.dumps(self.app.xbmc.GetPosition()["result"])
+      elif command == "seek":
+         val = int(params[1])
+         return json.dumps(self.app.xbmc.Seek(val)["result"])
       return "ok"
 
 class TwitchHandler:

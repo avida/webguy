@@ -15,11 +15,14 @@
    <h1>Raspi</h1>
    <a href="http://192.168.1.117" class="ui-btn-right">VLC</a>
 </div>
+<div id="player-info">Info</div>
+<label for="pos-slider" class="ui-hidden-accessible">Position:</label>
+<input name="pos-slider" id="pos-slider" min="0" max="100" value="0" type="range" data-highlight="true">
 <ul data-role="listview">
 <li>
     <div>
-    <span>Socket 4</span>
-    <input data-role="flipswitch" name="flip-s4" id="flip-s4" type="checkbox">
+    <span>Socket 17</span>
+    <input data-role="flipswitch" name="flip-s17" id="flip-s17" type="checkbox">
     </div>
 </li>
 </ul>
@@ -237,27 +240,46 @@ $("#btn-browse").bind("click", function(event, ui){
    $.get('srv/browse/'+path.join('/'), browseHandle)
 })
 <!-- Page section -->
+function updateStatus(data){
+   var pos_info = JSON.parse(data)
+   $("#player-info").html(format("%s:%s:%s - %s:%s:%s",
+                         [pos_info["totaltime"]["hours"],
+                          pos_info["totaltime"]["minutes"],
+                          pos_info["totaltime"]["seconds"],
+                          pos_info["time"]["hours"],
+                          pos_info["time"]["minutes"],
+                          pos_info["time"]["seconds"]]))
+    var slider = $('#pos-slider')
+    slider.val(pos_info["percentage"])
+    slider.slider('refresh')
+    $('#pos-slider').on('slidestop', function(event,ui){
+        $.get('srv/player/seek/' + slider.val())
+    })
+}
 
 $(document).ready( function(){
-   $.get('srv/socket/get/4', function(val){
+   if (document.URL.search('#')==-1){
+      $.get('srv/player/info',updateStatus);
+   }
+   $.get('srv/socket/get/17', function(val){
     if (val == '1')
     {
-        $('#flip-s4').prop('checked', true)
+        $('#flip-s17').prop('checked', true)
     }
     else
     {
-        $('#flip-s4').prop('checked', false)
+        $('#flip-s17').prop('checked', false)
     }
-    $('#flip-s4').flipswitch('refresh')
-    $('#flip-s4').change(function()
+    $('#flip-s17').flipswitch('refresh')
+    $('#flip-s17').change(function()
     {
-        if ($('#flip-s4').is(':checked'))
+        if ($('#flip-s17').is(':checked'))
         {
-            $.get('srv/socket/set/4/1')
+            $.get('srv/socket/set/17/1')
         }
         else
         {
-            $.get('srv/socket/set/4/0')
+            $.get('srv/socket/set/17/0')
         }
     })
    })

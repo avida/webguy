@@ -40,8 +40,8 @@ if 'raspi' in sys.argv:
     try:
         from  serial_listener import startListen
         startListen()
-    except:
-        print ("No serial module")
+    except Exception as e:
+        print ("No serial module:", e)
     handler_class = RaspiMainHandler
 else:
     print ("main hanlder")

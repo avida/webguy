@@ -18,15 +18,17 @@ def readlineCR(port):
 class CommandProcessor:
     def __init__(self):
         self.last = False
+        self.interval = 0
+
     def process(self, cmd):
         if not self.last:
-            if self.processFunc(cmd):
-                self.last = time.time()
+            self.interval = self.processFunc(cmd)
+            self.last = time.time()
         else:
             elapsed = time.time() - self.last
-            if elapsed >= COMMAND_INTERVAL:
-                if self.processFunc(cmd):
-                    self.last = time.time()
+            if elapsed >= self.interval:
+                self.interval = self.processFunc(cmd)
+                self.last = time.time()
     def sendRequest(self, req):
         con = http.client.HTTPConnection('127.0.0.1')
         con.request("GET", req)
@@ -34,17 +36,20 @@ class CommandProcessor:
 
     def processFunc(self, cmd):
         if 'ff000f' in cmd:
-            self.sendRequest("/srv/socket/switch/4")
-            return True
+            self.sendRequest("/srv/socket/switch/17")
+            return 5
         elif '6509af' in cmd:
             self.sendRequest("/srv/player/forward")
+            return 1
         elif 'd002ff' in cmd:
             self.sendRequest("/srv/player/pplay")
+            return 1
         elif 'e501af' in cmd:
             self.sendRequest("/srv/player/backward")
+            return 1
         elif '9f060f' in cmd:
             self.sendRequest("/srv/radio/stop")
-        return False
+        return 0
     
 class UARTThread(threading.Thread):
     def __init__(self):
