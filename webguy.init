@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export LANG=en_US.UTF-8
+
 WEBGUY_PATH="/home/xbian/webguy/"
 WEBGUY_WD=$WEBGUY_PATH/python
 
