@@ -65,12 +65,19 @@ class XBMC:
          return self.rpc.method("Player.Seek", {"playerid": self.activePlayerId, "value": val})
       return self.DoWithPlayerId(_Seek)
 
+   def Stop(self):
+      def _Stop(self):
+         return self.rpc.method("Player.Stop", {"playerid": self.activePlayerId})
+      return self.DoWithPlayerId(_Stop)
+
    def GetPosition(self):
       def _GetPosition(self):
          return self.rpc.method("Player.GetProperties", {"playerid": self.activePlayerId, 
                                                          "properties":["playlistid", "position", "totaltime", "time", "percentage"]})
       return self.DoWithPlayerId(_GetPosition)
 
+   def SetAudioDevice(self, device):
+      return self.rpc.method("Settings.SetSettingValue", {'setting': 'audiooutput.audiodevice', 'value': device })
 
    def openYoutubeVideo(self, video_id): 
       yt_template = "plugin://plugin.video.youtube/?action=play_video&videoid=%s"
@@ -99,6 +106,10 @@ if __name__ == "__main__":
       js = xbmc.GetPosition()
    elif "seek" in sys.argv:
       js = xbmc.Seek(54)
+   elif "device" in sys.argv:
+      js = xbmc.SetAudioDevice('PI:HDMI')
+   elif "stop" in sys.argv:
+      js = xbmc.Stop()
    print (js)
    print (json.dumps(js, indent=2))
    #js = rpc.method("Files.GetDirectory",{"directory":"/mnt/nfs/.hidden","properties":["size"]} )

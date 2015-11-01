@@ -43,7 +43,9 @@
 <button  value="Browse" type="button" id="btn-browse-twitch">Browse Games</button>
 <button  value="Radio" type="button" id="btn-stations">Radio</button>
 <button  value="Stop" type="button" id="btn-stop">Stop</button>
+<button  value="Music" type="button" id="btn-music">Music</button>
 <button  value="Youtube" type="button" id="btn-youtube">Youtube</button>
+<button  value="System" type="button" id="btn-system">System</button>
 
 </div><!-- main page-->
 
@@ -77,6 +79,7 @@
     <div class="ui-block-b"><button  type="button" id="twitch-btn-next">Next</button></div>
     </fieldset>
     </div> <!-- twitch browser page -->
+   
 <div data-role="page" id="youtube-page" data-theme="a">
    <div data-role="header" id="youtube-hdr">
    / 
@@ -95,6 +98,25 @@
     -->
     </div> <!-- youtube browser page -->
 
+<div data-role="page" id="music-page" data-theme="a">
+   <div data-role="header" id="music-hdr">
+   / 
+   </div>
+   <ul data-role="listview" id="music-items">
+   </ul>
+    </div> <!-- music browser page -->
+
+<div data-role="page" id="system-page" data-theme="a">
+   <div data-role="header" id="system-hdr">
+   System settings
+   </div>
+   <button type="button" id="btn-system-audio-hdmi">HDMI</button>
+   <button type="button" id="btn-system-audio-analog">Speakers</button>
+    </div> <!-- system page -->
+
+ <div data-role="popup" id="dirPopup">
+   <div id="popup-msg">This is a completely basic popup, no options set.</div>
+   </div>
 
 <script src="./raspi/script.js"></script>
 <script>
@@ -124,10 +146,9 @@ var current_page = 1
 function stationsLoaded(data)
 {
    try{
-   var stations = JSON.parse(data)
+       var stations = JSON.parse(data)
     }
-    catch(e)
-    {
+    catch(e){
        window.alert(e.message + "\n Data:\n" + data)
        return
     }

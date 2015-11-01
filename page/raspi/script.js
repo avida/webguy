@@ -131,4 +131,61 @@ $("#search-form").on("submit", function(){
     $.get('srv/youtube/search/'+val, searchDone)
     return false
 })
+// ------------------Music staff------------------//
+var music_path = []
 
+function processMusicItems(data){
+   var list = JSON.parse(data)
+   $.mobile.loading("hide")
+   $('#music-items').empty()
+   var dirs  = list['dirs']
+   var files = list['files']
+   for (dir in dirs){
+      var el = $('<li>', { class:'dirItem'}).html(dirs[dir])
+      $('#music-items').append(el)
+   }
+   for (file in files){
+    var el = $('<li>', { class:'fileItem'}).html(files[file])
+      $('#music-items').append(el)
+
+   }
+   $('#music-items').listview('refresh')
+
+}
+
+$('#btn-music').bind('click', function(event, ui){
+   window.open('#music-page', '_self')
+   music_path = []
+   $.get('srv/music', processMusicItems)
+})
+
+$('#music-items').on('tap', 'li', function(){
+   var item = $(this).html()
+   var isDir = $(this).is(".dirItem")
+   //music_path.push(item)
+   $.mobile.loading("show",{ 
+      text:item,
+      textVisible:true 
+      })
+   $.get('srv/music/'+ item, itemLoaded)
+
+})
+$('#music-items').on('taphold', 'li', function(){
+   var item = $(this).html()
+   $('#dirPopup').popup()
+   $('#popup-msg').html(item)
+   $('#dirPopup').popup('open')
+})
+
+//--------------------- System staff -------------------/
+
+$('#btn-system').on('click', function(event, ui){
+   window.open('#system-page', '_self')
+   $('#btn-system-audio-hdmi').on('click', function(event,ui){
+      $.get('srv/system/hdmi')
+   })
+   $('#btn-system-audio-analog').on('click', function(event,ui){
+      $.get('srv/system/analog')
+   })
+
+})

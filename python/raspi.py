@@ -46,8 +46,7 @@ class RadioHandler:
                MOCP.play(stream)
                return stream
         elif command == "stop":
-            MOCP.stop()
-            self.app.player.quitPlayer()
+            self.app.xbmc.Stop()
             return "stopped"
         elif command == "info":
             return MOCP.getCurrentTitle()
@@ -102,6 +101,27 @@ class BrowserHanlder(FileBrowser):
          print (path)
          self.app.xbmc.Open(path)
       return "ok"
+
+class MusiciBrowserHandler(FileBrowser):
+   def __init__(self, app):
+      self.app = app
+      FileBrowser.__init__(self, '/mnt/music')
+
+   def __call__(self, params):
+      if len(params) != 0:
+         path = urllib.parse.unquote('/'.join(params))
+         path = html.unescape(path)
+         self.app.xbmc.Stop()
+         self.app.xbmc.ClearPlaylist(0)
+         self.app.xbmc.AddToPlayList(0, path, type="directory")
+         self.app.xbmc.StartPlaylist(0)
+         return "ok"
+      try:
+         path = urllib.parse.unquote('/'.join(params))
+         path = html.unescape(path)
+         return self.processItemOnFS(path);
+      except FileBrowser.NotADirException:
+         return "not a dir"
 
 class PlayerHandler:
    def __init__(self, app):
@@ -172,6 +192,18 @@ class YouTubeHandler:
             except IndexError:
                 return "not ok"
         return "Not found"
+class SystemHandler:
+   def __init__(self, app):
+      self.app = app
+
+   def __call__(self, params):
+      command = params[0]
+      if command == 'hdmi':
+         self.app.xbmc.SetAudioDevice('PI:HDMI')
+      elif command == 'analog':
+         self.app.xbmc.SetAudioDevice('PI:Analogue')
+      return 'ok'
+
 class App:
    def __init__(self):
       self.xbmc = XBMC()
@@ -182,5 +214,7 @@ class App:
       self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
       self.dispatcher.addHandler('/srv/twitch', TwitchHandler(self));
       self.dispatcher.addHandler('/srv/youtube', YouTubeHandler(self));
+      self.dispatcher.addHandler('/srv/music', MusiciBrowserHandler(self));
+      self.dispatcher.addHandler('/srv/system', SystemHandler(self));
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)
