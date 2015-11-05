@@ -9,7 +9,7 @@ do_start()
 {
   echo "Starting service"
   cd $WEBGUY_WD
-  ./server.py raspi &
+  ./server.py raspi 2>&1 > /dev/null &
 }
 
 do_stop()
@@ -23,10 +23,10 @@ case "$1" in
       do_start
    ;;
    stop)
-   do_stop
+      do_stop
    ;;
    restart)
-   do_stop
-   do_start
+      do_stop
+      do_start
    ;;
 esac

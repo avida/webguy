@@ -32,7 +32,7 @@ class XBMC:
       return self.rpc.method("Playlist.Clear", {"playlistid":id})
 
    def StartPlaylist(self, id):
-      return self.rpc.method("Player.Open",{"item":{"playlistid":id} } )
+      return self.rpc.method("Player.Open",{"item":{"playlistid":id}, "options":{"shuffled": True, "repeat":True} } )
 
    def Open(self, item):
       return self.rpc.method("Player.Open",{"item":{"file":item} } )
@@ -88,7 +88,19 @@ class XBMC:
       twitch_template = "plugin://plugin.video.twitch/playLive/%s"
       resp = self.rpc.method("Player.Open", {"item": {"file":twitch_template % video_id }} )
       return resp
+   
+   def setVolume(self, volume):
+      resp = self.rpc.method("Application.SetVolume", {"volume":volume})
+      return resp
 
+   def getVolume(self):
+      resp = self.rpc.method("Application.GetProperties", {"properties":["volume"]})
+      return resp
+
+   def Action(self, action):
+      resp = self.rpc.method("Input.ExecuteAction", {"action": action })
+      return resp
+      
 if __name__ == "__main__":
    import sys
    rpc = JsonRPC()
@@ -110,6 +122,12 @@ if __name__ == "__main__":
       js = xbmc.SetAudioDevice('PI:HDMI')
    elif "stop" in sys.argv:
       js = xbmc.Stop()
+   elif "volume" in sys.argv:
+      js = xbmc.setVolume(100)
+   elif "getvolume" in sys.argv:
+      js = xbmc.getAppProperties()
+   elif "action" in sys.argv:
+      js = xbmc.Action("playpause")
    print (js)
    print (json.dumps(js, indent=2))
    #js = rpc.method("Files.GetDirectory",{"directory":"/mnt/nfs/.hidden","properties":["size"]} )

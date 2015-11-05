@@ -13,7 +13,6 @@
 <div data-role="page" id="main">
 <div data-role="header">
    <h1>Raspi</h1>
-   <a href="http://192.168.1.117" class="ui-btn-right">VLC</a>
 </div>
 <div id="player-info">Info</div>
 <label for="pos-slider" class="ui-hidden-accessible">Position:</label>
@@ -115,7 +114,7 @@
     </div> <!-- system page -->
 
  <div data-role="popup" id="dirPopup">
-   <div id="popup-msg">This is a completely basic popup, no options set.</div>
+   <div id="popup-msg"></div>
    </div>
 
 <script src="./raspi/script.js"></script>
@@ -304,14 +303,14 @@ $(document).ready( function(){
         }
     })
    })
-    $.get('srv/radio/volume/get', function(val){
+    $.get('srv/player/volume/get', function(val){
 
        var slider = $('#vol-slider')
        slider.val(val)
        slider.slider('refresh')
 
        $('#vol-slider').on('slidestop', function(event,ui){
-           $.get('srv/radio/volume/set/' + slider.val())
+           $.get('srv/player/volume/set/' + slider.val())
        })
 
     })

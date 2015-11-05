@@ -102,7 +102,7 @@ class BrowserHanlder(FileBrowser):
          self.app.xbmc.Open(path)
       return "ok"
 
-class MusiciBrowserHandler(FileBrowser):
+class MusicBrowserHandler(FileBrowser):
    def __init__(self, app):
       self.app = app
       FileBrowser.__init__(self, '/mnt/music')
@@ -110,7 +110,7 @@ class MusiciBrowserHandler(FileBrowser):
    def __call__(self, params):
       if len(params) != 0:
          path = urllib.parse.unquote('/'.join(params))
-         path = html.unescape(path)
+         path = html.unescape(self.dir_path+'/'+path)
          self.app.xbmc.Stop()
          self.app.xbmc.ClearPlaylist(0)
          self.app.xbmc.AddToPlayList(0, path, type="directory")
@@ -136,12 +136,22 @@ class PlayerHandler:
       elif command == "backward":
          self.app.xbmc.Seek("smallbackward")
       elif command == "audio":
-         self.app.player.switchAudio()
+         self.app.xbmc.Action("audionextlanguage")
       elif command == "info":
          return json.dumps(self.app.xbmc.GetPosition()["result"])
       elif command == "seek":
          val = int(params[1])
          return json.dumps(self.app.xbmc.Seek(val)["result"])
+      elif command == "volume":
+         operation = params[1]
+         if operation == "get":
+            vol = self.app.xbmc.getVolume()["result"]["volume"]
+            return str(vol)
+         elif operation == "set":
+            val = int(params[2])
+            self.app.xbmc.setVolume(val)
+            return "ok"
+         return "invalid request"
       return "ok"
 
 class TwitchHandler:
@@ -214,7 +224,7 @@ class App:
       self.dispatcher.addHandler('/srv/player', PlayerHandler(self));
       self.dispatcher.addHandler('/srv/twitch', TwitchHandler(self));
       self.dispatcher.addHandler('/srv/youtube', YouTubeHandler(self));
-      self.dispatcher.addHandler('/srv/music', MusiciBrowserHandler(self));
+      self.dispatcher.addHandler('/srv/music', MusicBrowserHandler(self));
       self.dispatcher.addHandler('/srv/system', SystemHandler(self));
    def processRequest(self, req_handler):
       return self.dispatcher.dispatchUrl(req_handler.request.uri)
