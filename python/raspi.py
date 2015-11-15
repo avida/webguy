@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import time
+import pathlib
 from gpio import RaspiGPIOOut
 from dirble_backend import Dirble
 from mocp import MOCP
@@ -111,9 +112,12 @@ class MusicBrowserHandler(FileBrowser):
       if len(params) != 0:
          path = urllib.parse.unquote('/'.join(params))
          path = html.unescape(self.dir_path+'/'+path)
+         type = 'directory'
+         if pathlib.Path(path).is_file():
+            type = 'file'
          self.app.xbmc.Stop()
          self.app.xbmc.ClearPlaylist(0)
-         self.app.xbmc.AddToPlayList(0, path, type="directory")
+         self.app.xbmc.AddToPlayList(0, path, type=type)
          self.app.xbmc.StartPlaylist(0)
          return "ok"
       try:

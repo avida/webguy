@@ -32,7 +32,7 @@ class XBMC:
       return self.rpc.method("Playlist.Clear", {"playlistid":id})
 
    def StartPlaylist(self, id):
-      return self.rpc.method("Player.Open",{"item":{"playlistid":id}, "options":{"shuffled": True, "repeat":True} } )
+      return self.rpc.method("Player.Open",{"item":{"playlistid":id}, "options":{"shuffled": True, "repeat":"all"} } )
 
    def Open(self, item):
       return self.rpc.method("Player.Open",{"item":{"file":item} } )
@@ -113,7 +113,7 @@ if __name__ == "__main__":
    elif "list" in sys.argv:
       js = xbmc.GetPlayListItems(0)
    elif "add" in sys.argv:
-      js = xbmc.AddToPlayList(0, "/mnt/music/Music/5nizza", "directory")
+      js = xbmc.AddToPlayList(0, "/mnt/music/5nizza", "directory")
    elif "pos" in sys.argv:
       js = xbmc.GetPosition()
    elif "seek" in sys.argv:
