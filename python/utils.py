@@ -22,9 +22,10 @@ class DirFetcher(threading.Thread):
       self.is_running = True
       print ("start")
       if os.path.isfile(self.path):
-          raise FileBrowser.NotADirException("Is not a dir")
-      _, d, f = next(os.walk(self.path))
-      self.dir = d, f
+          self.dir = None
+      else:
+          _, d, f = next(os.walk(self.path))
+          self.dir = d, f
       self.is_running = False
       self.cond.acquire()
       self.cond.notify()
@@ -42,6 +43,8 @@ class DirFetcher(threading.Thread):
       print ("wait")
       self.cond.wait(self.TIMEOUT)
       self.cond.release()
+      if self.dir == None:
+          raise FileBrowser.NotADirException("Is not a dir")
       return self.dir
 
 
