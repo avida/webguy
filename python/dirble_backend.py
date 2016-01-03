@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import http.client
+from web_backend import ServiceConnection
 from urllib.parse import urlparse
 import json
 token = "3954ccb7fcb40fe2612c15457f"
@@ -35,8 +36,9 @@ class DirbleConnection:
         else:
             return resp.read().decode("utf-8")
             
-class Dirble:
+class Dirble(ServiceConnection):
     def __init__(self):
+        ServiceConnection.__init__(self, drible_host, https=True)
         self.current_page = 1
         self.pages = 0
         self.connection = None
@@ -48,19 +50,11 @@ class Dirble:
     def createGetStationRequest(self, station_id):
         return station_template % (station_id, token)
 
-    def getData(self, req):
-        try:
-            if not self.connection:
-                self.connection = DirbleConnection(drible_host)
-            return json.loads( self.connection.getData(req) )
-        except http.client.HTTPException:
-            self.connection = DirbleConnection(drible_host)
-            return []
-
     def loadList(self):
-        lst = self.getData(self.createRequest())
+        lst, hdrs = self.getData(self.createRequest(), withHeaders = True)
+        lst = json.loads(lst)
         if not self.pages:
-            self.pages = self.connection.pages
+            self.pages = hdrs['X-Total-Pages']
         if len(lst) != 0:
            self.cache = lst
         return lst
@@ -70,7 +64,7 @@ class Dirble:
             return self.cache[station_id]
         r = self.createGetStationRequest(station_id)
         print(r)
-        return self.getData(self.createGetStationRequest(station_id))
+        return json.loads(self.getData(self.createGetStationRequest(station_id)))
 
     def NextPage(self):
         if self.pages and self.current_page < self.pages:

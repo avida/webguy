@@ -51,7 +51,7 @@ class ServiceConnection:
                         return "Bad response"
                     data = resp.read().decode("utf-8")
                     if withHeaders:
-                        return (data, resp.headers())
+                        return (data, resp.headers)
                     else:
                         return data
                 # Broken pipe occures on https connection

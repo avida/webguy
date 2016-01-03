@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+#!/usr/bin/python3
 
 """
 Small module for use with the wake on lan protocol.

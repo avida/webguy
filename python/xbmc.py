@@ -84,6 +84,12 @@ class XBMC:
       resp = self.rpc.method("Player.Open", {"item": {"file":yt_template % video_id }} )
       return resp
 
+   def openYoutubeList(self, list_id): 
+      yt_template = "plugin://plugin.video.youtube/?path=/root/video&order=default&action=play_all&playlist=%s"
+      resp = self.rpc.method("Player.Open", {"item": {"file":yt_template % list_id }, 
+                                             "options":{"shuffled": False, "repeat": "all"}} )
+      return resp
+
    def openTwitchStream(self, video_id): 
       twitch_template = "plugin://plugin.video.twitch/playLive/%s"
       resp = self.rpc.method("Player.Open", {"item": {"file":twitch_template % video_id }} )
@@ -109,9 +115,9 @@ if __name__ == "__main__":
    if "clear" in sys.argv:
       js = xbmc.ClearPlaylist(0);
    elif "play" in sys.argv:
-      js = xbmc.StartPlaylist(0)
+      js = xbmc.StartPlaylist(1)
    elif "list" in sys.argv:
-      js = xbmc.GetPlayListItems(0)
+      js = xbmc.GetPlayListItems(1)
    elif "add" in sys.argv:
       js = xbmc.AddToPlayList(0, "/mnt/music/5nizza", "directory")
    elif "pos" in sys.argv:
@@ -128,6 +134,8 @@ if __name__ == "__main__":
       js = xbmc.getAppProperties()
    elif "action" in sys.argv:
       js = xbmc.Action("playpause")
+   elif "youtube" in sys.argv:
+      js = xbmc.openYoutubeList("PL479397D4B900C7A4")
    print (js)
    print (json.dumps(js, indent=2))
    #js = rpc.method("Files.GetDirectory",{"directory":"/mnt/nfs/.hidden","properties":["size"]} )

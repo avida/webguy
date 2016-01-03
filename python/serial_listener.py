@@ -54,6 +54,7 @@ class CommandProcessor:
 class UARTThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
+        self.setDaemon(True)
     def run(self):
         cp = CommandProcessor()
         while True:

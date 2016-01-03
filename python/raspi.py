@@ -33,6 +33,7 @@ class RadioHandler:
             val = params[1]
             self.dirble.current_page = int(val)
             page_info = self.dirble.loadList()
+            print (page_info)
             pi = [ {"id":x["id"], 
                     "name": x["name"], 
                     "country": x["country"],
