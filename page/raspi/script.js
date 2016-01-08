@@ -81,7 +81,7 @@ function browseHandle(data){
    var dirs = list["dirs"]
    var files = list["files"]
    var file_display = files
-   if (path.length != 0 ){
+   if (path.length != 0  && files.length >= 2){
       file_display = reduce_lines(files.slice(0))
    }
    title_to_info = {}
