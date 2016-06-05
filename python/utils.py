@@ -20,27 +20,27 @@ class DirFetcher(threading.Thread):
 
    def run(self):
       self.is_running = True
-      print ("start")
-      if os.path.isfile(self.path):
-          self.dir = None
-      else:
-          _, d, f = next(os.walk(self.path))
-          self.dir = d, f
+      try:
+         if os.path.isfile(self.path):
+             self.dir = None
+         else:
+             _, d, f = next(os.walk(self.path))
+             self.dir = d, f
+      except Exception:
+         self.dir = None
+         
       self.is_running = False
       self.cond.acquire()
       self.cond.notify()
       self.cond.release()
 
    def Fetch(self, path):
-      print ("start1")
       if self.is_running:
          return self.EMPTY_DIR
       self.__init__()
       self.path = path
       self.start()
-      print ("wait")
       self.cond.acquire()
-      print ("wait")
       self.cond.wait(self.TIMEOUT)
       self.cond.release()
       if self.dir == None:

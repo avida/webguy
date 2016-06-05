@@ -37,5 +37,5 @@ class Twitch (ServiceConnection):
 if __name__ == "__main__":
     print("Twitch module")
     t = Twitch()
-    for s in t.searchStreams("StarCraft%20II", 2):
+    for s in t.searchStreams("Overwatch", 0):
         print(s)

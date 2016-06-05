@@ -201,7 +201,7 @@ function twitchStreamHandle(data)
       var url = list[stream][1]
       var img = list[stream][2]
       var viewers = list[stream][3]
-      $('#twitch-lst-dir').append(format('<li class="fileItem" twitch_url="%s"><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [url, img, title, viewers]))
+      $('#twitch-lst-dir').append(format('<li class="fileItem" twitch_url="%s"><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [title, img, title, viewers]))
       }
    $('#twitch-lst-dir').listview('refresh')
    $.mobile.loading("hide")

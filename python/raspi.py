@@ -45,10 +45,11 @@ class RadioHandler:
             if len(station_info["streams"]) > 0:
                stream = station_info["streams"][0]["stream"]
                self.app.xbmc.Open(stream)
-               MOCP.play(stream)
+               self.app.xbmc.SetAudioDevice('PI:Analogue')
                return stream
         elif command == "stop":
             self.app.xbmc.Stop()
+            self.app.xbmc.SetAudioDevice('PI:HDMI')
             return "stopped"
         elif command == "info":
             return MOCP.getCurrentTitle()
@@ -120,6 +121,7 @@ class MusicBrowserHandler(FileBrowser):
          self.app.xbmc.ClearPlaylist(0)
          self.app.xbmc.AddToPlayList(0, path, type=type)
          self.app.xbmc.StartPlaylist(0)
+         self.app.xbmc.SetAudioDevice('PI:Analogue')
          return "ok"
       try:
          path = urllib.parse.unquote('/'.join(params))
@@ -178,6 +180,7 @@ class TwitchHandler:
             return json.dumps(self.twitch.searchStreams(game, page))
         elif command == "play":
             channel = params[1]
+            print(str(params))
             self.app.xbmc.openTwitchStream(channel)
         return "Ok"
 

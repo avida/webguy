@@ -4,14 +4,14 @@ from web_backend import ServiceConnection
 
 class JsonRPC:
    def __init__(self):
-      self.connection = ServiceConnection("127.0.0.1:8080")
+      self.connection = ServiceConnection("127.0.0.1:8082")
       self.template = '{"jsonrpc":"2.0","id":"1","method":"%s","params":%s}'
-      self.url_template = "/jsonrpc?%s"
+      self.url_template = "/jsonrpc"
       self.hdrs = {"Content-Type": "application/json"}
 
    def method(self, method, params):
       body = self.template % (method, json.dumps(params))
-      resp = self.connection.getData(self.url_template % method, headers = self.hdrs, data = body )
+      resp = self.connection.getData(self.url_template, headers = self.hdrs, data = body )
       return json.loads(resp)
 
 class XBMC:
@@ -75,24 +75,30 @@ class XBMC:
          return self.rpc.method("Player.GetProperties", {"playerid": self.activePlayerId, 
                                                          "properties":["playlistid", "position", "totaltime", "time", "percentage"]})
       return self.DoWithPlayerId(_GetPosition)
+      
+   def GetItem(self):
+      def _GetItem(self):
+         return self.rpc.method("Player.GetItem", {"playerid": self.activePlayerId, 
+                                                         "properties":[]})
+      return self.DoWithPlayerId(_GetItem)
 
    def SetAudioDevice(self, device):
       return self.rpc.method("Settings.SetSettingValue", {'setting': 'audiooutput.audiodevice', 'value': device })
 
    def openYoutubeVideo(self, video_id): 
-      yt_template = "plugin://plugin.video.youtube/?action=play_video&videoid=%s"
+      yt_template = "plugin://plugin.video.youtube/play/?video_id=%s"
       resp = self.rpc.method("Player.Open", {"item": {"file":yt_template % video_id }} )
       return resp
 
    def openYoutubeList(self, list_id): 
-      yt_template = "plugin://plugin.video.youtube/?path=/root/video&order=default&action=play_all&playlist=%s"
+      yt_template = "plugin://plugin.video.youtube/play/?playlist_id=%s&order=default"
       resp = self.rpc.method("Player.Open", {"item": {"file":yt_template % list_id }, 
                                              "options":{"shuffled": False, "repeat": "all"}} )
       return resp
 
    def openTwitchStream(self, video_id): 
-      twitch_template = "plugin://plugin.video.twitch/playLive/%s"
-      resp = self.rpc.method("Player.Open", {"item": {"file":twitch_template % video_id }} )
+      twitch_template = "plugin://plugin.video.twitch/playLive/%s/0"
+      resp = self.rpc.method("Player.Open", {"item": {"file":twitch_template % video_id.lower() }} )
       return resp
    
    def setVolume(self, volume):
@@ -118,6 +124,10 @@ if __name__ == "__main__":
       js = xbmc.StartPlaylist(1)
    elif "list" in sys.argv:
       js = xbmc.GetPlayListItems(1)
+   elif "lists" in sys.argv:
+      js = xbmc.GetPlayLists()
+   elif "info" in sys.argv:
+      js = xbmc.GetItem()
    elif "add" in sys.argv:
       js = xbmc.AddToPlayList(0, "/mnt/music/5nizza", "directory")
    elif "pos" in sys.argv:
@@ -135,7 +145,9 @@ if __name__ == "__main__":
    elif "action" in sys.argv:
       js = xbmc.Action("playpause")
    elif "youtube" in sys.argv:
-      js = xbmc.openYoutubeList("PL479397D4B900C7A4")
+      js = xbmc.openYoutubeList("PL4B999A7ABBB327A1")
+   elif "twitch" in sys.argv:
+      js = xbmc.openTwitchStream("Miramisu")
    print (js)
    print (json.dumps(js, indent=2))
    #js = rpc.method("Files.GetDirectory",{"directory":"/mnt/nfs/.hidden","properties":["size"]} )
