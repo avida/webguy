@@ -74,7 +74,20 @@ class FileBrowser:
           return data
       except UnicodeEncodeError:
           return "Error decoding path characters. Probably system locale is not an uniconde"
+
+def LoadFile(filename):
+  if not os.path.isfile(filename):
+     return None
+  with open(filename, "r") as f:
+   return f.read()  
+
+def WriteToFile(filename, data):
+   with open(filename, "w") as f:
+      f.write(data)
+
 if __name__ == "__main__":
+   print(LoadFile("dlna.py"))
+   exit(0)
    browser = FileBrowser("/mnt/nfs")
    while True:
      print (browser.processItemOnFS('.'))
