@@ -62,6 +62,15 @@ class Scheduler (threading.Thread):
          event_data = self.settings.data["events"][event]
          self.enterabs(float(event), eval(event_data["action"]), *event_data["argument"], **event_data["kwargs"])
 
+   @property
+   def list(self):
+      lst = []
+      for e in self.s.queue:
+         lst.append( "{0}: {1}".format(
+             datetime.datetime.fromtimestamp(e.time).strftime("%d/%m, %H:%M:%S"),
+             e.action.serialize()))
+      return lst
+
    def UpdateSettings(self):
       self.settings.clearEvents()
       for e in self.s.queue:
@@ -89,7 +98,7 @@ class Action:
 
 @Action("print_time")
 def print_time(id, **kwargs):
-   print("Time is", time.time(), " ",id ) 
+   print("Time is", time.time(), " ",id, "  ",datetime.datetime.now() ) 
 
 @Action("print_datetime")
 def print_datetime(arg, **kwargs):
@@ -98,6 +107,7 @@ def print_datetime(arg, **kwargs):
 print (time.time())
 a = Scheduler()
 a.enter(4, print_time, 5, he="heee")
+print (a.list)
 #a.enterFromDate(datetime.datetime.now() + datetime.timedelta(hours=3), print_datetime, "alaram!!", other="oth" )
 try:
    a.start()

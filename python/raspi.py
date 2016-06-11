@@ -145,7 +145,7 @@ class PlayerHandler:
       elif command == "audio":
          self.app.xbmc.Action("audionextlanguage")
       elif command == "info":
-         return json.dumps(self.app.xbmc.GetPosition()["result"])
+         return self.playerInfo()
       elif command == "seek":
          val = int(params[1])
          return json.dumps(self.app.xbmc.Seek(val)["result"])
@@ -160,6 +160,11 @@ class PlayerHandler:
             return "ok"
          return "invalid request"
       return "ok"
+
+   def playerInfo(self):
+      position = self.app.xbmc.GetPosition()["result"]
+      position["label"] = self.app.xbmc.GetItem()["result"]["item"]["label"]
+      return json.dumps(position)
 
 class TwitchHandler:
     def __init__(self, app):

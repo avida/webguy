@@ -22,7 +22,7 @@ class ServiceConnection:
                     self.c = http.client.HTTPSConnection(self.host)
                 else:  
                     self.c = http.client.HTTPConnection(self.host)
-                self.c.set_debuglevel(1)
+                self.c.set_debuglevel(0)
                 print("connected")
                 return
             except Exception:
@@ -31,7 +31,6 @@ class ServiceConnection:
         raise ConnectionRetriesiExceeded(self.retries)
 
     def getData(self, req, withHeaders = False, headers = None, data = None): 
-        print (req)
         try:
             if not self.c:
                 self.tryToConnect()

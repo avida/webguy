@@ -36,16 +36,43 @@
 <div class="ui-block-a"><button  type="button" id="btn-fullscreen">Fullscreen</button></div>
 <div class="ui-block-b"><button  type="button" id="btn-audio">Switch audio</button></div>
 </fieldset>
-
-<button  value="Pause/Play" type="button" id="btn-pplay">Pause/Play</button>
-<button  value="Browse" type="button" id="btn-browse">Browse</button>
-<button  value="Browse" type="button" id="btn-browse-twitch">Browse Games</button>
-<button  value="Radio" type="button" id="btn-stations">Radio</button>
-<button  value="Stop" type="button" id="btn-stop">Stop</button>
-<button  value="Music" type="button" id="btn-music">Music</button>
-<button  value="Youtube" type="button" id="btn-youtube">Youtube</button>
-<button  value="System" type="button" id="btn-system">System</button>
-
+<div class="ui-grid-a">
+<div class="ui-block-a">
+<button  value="Pause/Play" type="button" id="btn-pplay"><img src="img/pplay.png"></button>
+</div>
+<div class="ui-block-b">
+<button value="Youtube" type="button" id="btn-youtube"><img src="img/youtube.png"/></button>
+</div>
+<div class="ui-block-a">
+<button  value="Browse" type="button" id="btn-browse"><img src="img/files.png"></button>
+</div>
+<div class="ui-block-b">
+<button  value="Browse" type="button" id="btn-browse-twitch"><img src="img/twitch.png"/></button>
+</div>
+<div class="ui-block-a">
+<button  value="Radio" type="button" id="btn-stations"><img src="img/radio.png"></button>
+</div>
+<div class="ui-block-b">
+<button  value="Music" type="button" id="btn-music"><img src="img/music.png"/></button>
+</div>
+<div class="ui-block-a">
+<button  value="Stop" type="button" id="btn-stop"><img src="img/stop.png"></button>
+</div>
+<div class="ui-block-b">
+<button  value="System" type="button" id="btn-system"><img src="img/system.png"></button>
+</div>
+</div>
+<div data-role="collapsible">
+<h4><img src="img/tv.png"/></h4>
+   <div class="ui-grid-a">
+      <div class="ui-block-a">
+         <button id="btn_ch1">112</button>
+      </div>
+      <div class="ui-block-b">
+         <button id="btn_ch1">espresso</button>
+      </div>
+   </div>
+</div>
 </div><!-- main page-->
 
 <div data-role="page" id="stations">
@@ -142,26 +169,40 @@ $("#btn-back").bind("click", function(event, ui){
 })
 
 <!-- Page section -->
-function updateStatus(data){
-   var pos_info = JSON.parse(data)
-   $("#player-info").html(format("%s:%s:%s - %s:%s:%s",
-                         [pos_info["totaltime"]["hours"],
-                          pos_info["totaltime"]["minutes"],
-                          pos_info["totaltime"]["seconds"],
-                          pos_info["time"]["hours"],
-                          pos_info["time"]["minutes"],
-                          pos_info["time"]["seconds"]]))
+function timeDigitToString(digit) {
+   digit = String(digit)
+   return digit.length == 1 ? "0"+digit : digit
+}
+function initStatus(data){
+    updateInfo(data)
     var slider = $('#pos-slider')
-    slider.val(pos_info["percentage"])
-    slider.slider('refresh')
     $('#pos-slider').on('slidestop', function(event,ui){
         $.get('srv/player/seek/' + slider.val())
     })
 }
 
+function updateInfo(data){
+   var pos_info = JSON.parse(data)
+   $("#player-info").html(format("%s:%s:%s - %s:%s:%s  %s",
+                         [pos_info["totaltime"]["hours"],
+                          timeDigitToString(pos_info["totaltime"]["minutes"]),
+                          timeDigitToString(pos_info["totaltime"]["seconds"]),
+                          pos_info["time"]["hours"],
+                          timeDigitToString(pos_info["time"]["minutes"]),
+                          timeDigitToString(pos_info["time"]["seconds"]),
+                          pos_info["label"]
+                          ]))
+    var slider = $('#pos-slider')
+    slider.val(pos_info["percentage"])
+    slider.slider('refresh')
+    setTimeout(function(){
+      $.get('srv/player/info',updateInfo);
+       },1500)
+}
+
 $(document).ready( function(){
    if (document.URL.search('#')==-1){
-      $.get('srv/player/info',updateStatus);
+      $.get('srv/player/info',initStatus);
    }
    $.get('srv/socket/get/17', function(val){
     if (val == '1')

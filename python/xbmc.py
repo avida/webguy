@@ -43,7 +43,6 @@ class XBMC:
    def DoWithPlayerId(self, func):
       for i in range(0,3):
          resp = func(self)
-         print (resp)
          if "error" in resp:
             try:
                print("error: " + json.dumps(resp))
@@ -123,7 +122,7 @@ if __name__ == "__main__":
    elif "play" in sys.argv:
       js = xbmc.StartPlaylist(1)
    elif "list" in sys.argv:
-      js = xbmc.GetPlayListItems(1)
+      js = xbmc.GetPlayListItems(0)
    elif "lists" in sys.argv:
       js = xbmc.GetPlayLists()
    elif "info" in sys.argv:
