@@ -11,7 +11,7 @@ from gpio import RaspiGPIOOut
 from dirble_backend import Dirble
 from mocp import MOCP
 import url_handler
-from utils import FileBrowser
+from utils import FileBrowser, SystemUptime
 from omxplayer import  OMXPlayer
 import os.path
 from twitch import Twitch
@@ -19,6 +19,8 @@ from xbmc import XBMC
 from youtube import YouTube
 
 mocp = None
+def makeErrorResponse(msg):
+   return json.dumps({'error': str(msg)})
 class RadioHandler:
     def __init__(self, app):
         self.mocp = None
@@ -162,9 +164,12 @@ class PlayerHandler:
       return "ok"
 
    def playerInfo(self):
-      position = self.app.xbmc.GetPosition()["result"]
-      position["label"] = self.app.xbmc.GetItem()["result"]["item"]["label"]
-      return json.dumps(position)
+      try:
+         position = self.app.xbmc.GetPosition()["result"]
+         position["label"] = self.app.xbmc.GetItem()["result"]["item"]["label"]
+         return json.dumps(position)
+      except Exception as e:
+         return makeErrorResponse(e)
 
 class TwitchHandler:
     def __init__(self, app):
@@ -225,7 +230,13 @@ class SystemHandler:
          self.app.xbmc.SetAudioDevice('PI:HDMI')
       elif command == 'analog':
          self.app.xbmc.SetAudioDevice('PI:Analogue')
+      elif command == 'info':
+         return self.GetSystemInfo()
       return 'ok'
+   def GetSystemInfo(self):
+      info = {}
+      info["uptime"] = str(SystemUptime())
+      return info
 
 class App:
    def __init__(self):

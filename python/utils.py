@@ -3,6 +3,8 @@ import subprocess
 import os
 import threading, time
 import json
+import datetime
+import math
 
 def runCommand(cmd):
    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=True)
@@ -85,8 +87,16 @@ def WriteToFile(filename, data):
    with open(filename, "w") as f:
       f.write(data)
 
+def SystemUptime():
+   def getTimedelta(time):
+      return datetime.timedelta(seconds=
+                                math.floor(float(time)))
+   uptime, idletime =  LoadFile('/proc/uptime').split()
+   uptime = getTimedelta(uptime)
+   return uptime
+
 if __name__ == "__main__":
-   print(LoadFile("dlna.py"))
+   SystemUptime()
    exit(0)
    browser = FileBrowser("/mnt/nfs")
    while True:

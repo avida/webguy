@@ -366,6 +366,10 @@ $('#music-items').on('taphold', 'li', function(){
 })
 
 //--------------------- System staff -------------------/
+function updateSystemInfo(data){
+//   data = JSON.parse(data)
+   $('#uptime').html(data["uptime"])
+}
 
 $('#btn-system').on('click', function(event, ui){
    window.open('#system-page', '_self')
@@ -375,5 +379,6 @@ $('#btn-system').on('click', function(event, ui){
    $('#btn-system-audio-analog').on('click', function(event,ui){
       $.get('srv/system/analog')
    })
+   $.get('/srv/system/info', updateSystemInfo)
 
 })

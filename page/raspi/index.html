@@ -136,6 +136,8 @@
    <div data-role="header" id="system-hdr">
    System settings
    </div>
+   <div id="uptime">
+   </div>
    <button type="button" id="btn-system-audio-hdmi">HDMI</button>
    <button type="button" id="btn-system-audio-analog">Speakers</button>
     </div> <!-- system page -->
@@ -240,6 +242,8 @@ $(document).ready( function(){
 
 if (document.URL.search('#browser')!= -1)
    $.get('srv/browse/', browseHandle)
+if (document.URL.search('#system-page')!= -1)
+   $.get('/srv/system/info', updateSystemInfo)
 });
 </script>
 </body>
