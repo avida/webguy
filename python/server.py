@@ -23,10 +23,17 @@ class RaspiMainHandler(tornado.web.RequestHandler):
             import raspi
             web_app = raspi.App()
 
-    def get(self, *args):
-        print("get")
+    def getpost(self):
         global web_app
         self.write(web_app.processRequest(self))
+
+    def get(self, *args):
+        print("get")
+        self.getpost()
+
+    def post(self, *args):
+        print("post")
+        self.getpost()
 
 
 class MainHandler(tornado.web.RequestHandler):

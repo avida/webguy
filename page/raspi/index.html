@@ -117,11 +117,9 @@
    <ul data-role="listview" id="youtube-search-res">
    </ul>
     <fieldset class="ui-grid-a">
-    <!--
-    <div class="ui-block-a"><button  type="button" id="youtube-btn-prev">Prev</button></div>
-    <div class="ui-block-b"><button  type="button" id="youtube-btn-next">Next</button></div>
+    <div class="ui-block-a"><button  type="button" id="youtube-btn-prev"><<<<</button></div>
+    <div class="ui-block-b"><button  type="button" id="youtube-btn-next">>>>></button></div>
     </fieldset>
-    -->
     </div> <!-- youtube browser page -->
 
 <div data-role="page" id="music-page" data-theme="a">
@@ -185,6 +183,10 @@ function initStatus(data){
 
 function updateInfo(data){
    var pos_info = JSON.parse(data)
+   if (pos_info.error) {
+       console.log("Error getting info: " + pos_info.error)
+       return;
+   }
    $("#player-info").html(format("%s:%s:%s - %s:%s:%s  %s",
                          [pos_info["totaltime"]["hours"],
                           timeDigitToString(pos_info["totaltime"]["minutes"]),

@@ -32,7 +32,7 @@ class RadioHandler:
         self.app = app
         self.dirble = None
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         if not self.dirble:
             self.dirble = Dirble()
         command = params[0]
@@ -79,7 +79,7 @@ class RadioHandler:
 
 class SocketHandler:
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         command = params[0]
         socket = params[1]
         p = RaspiGPIOOut(int(socket))
@@ -102,7 +102,7 @@ class BrowserHanlder(FileBrowser):
         self.app = app
         FileBrowser.__init__(self, '/mnt/nfs')
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         try:
             path = urllib.parse.unquote('/'.join(params))
             path = html.unescape(path)
@@ -123,7 +123,7 @@ class MusicBrowserHandler(FileBrowser):
         self.app = app
         FileBrowser.__init__(self, '/mnt/music')
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         if len(params) != 0:
             path = urllib.parse.unquote('/'.join(params))
             path = html.unescape(self.dir_path + '/' + path)
@@ -149,7 +149,7 @@ class PlayerHandler:
     def __init__(self, app):
         self.app = app
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         command = params[0]
         if command == "forward":
             self.app.xbmc.Seek("smallforward")
@@ -192,7 +192,7 @@ class TwitchHandler:
         self.app = app
         self.twitch = Twitch()
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         command = params[0]
         if command == "games":
             try:
@@ -218,8 +218,9 @@ class YouTubeHandler:
         self.app = app
         self.yt = YouTube()
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         command = params[0]
+        print(kwargs["handler"].request.body)
         if command == "search":
             val = urllib.parse.unquote(params[1])
             try:
@@ -230,7 +231,12 @@ class YouTubeHandler:
                       x["snippet"]["title"],
                       x["snippet"]["thumbnails"]["medium"]["url"],
                       x["snippet"]["publishedAt"]] for x in js["items"] if x["id"]["kind"] == "youtube#video"]
-            result = json.dumps(items, indent=1)
+            res = {"items": items}
+            if "nextPageToken" in js:
+                res["nextToken"] = js["nextPageToken"]
+            if "prevPageToken" in js:
+                res["prevToken"] = js["prevPageToken"]
+            result = json.dumps(res, indent=1)
             return result
         elif command == "play":
             try:
@@ -246,7 +252,7 @@ class SystemHandler:
     def __init__(self, app):
         self.app = app
 
-    def __call__(self, params):
+    def __call__(self, params, **kwargs):
         command = params[0]
         if command == 'hdmi':
             self.app.xbmc.SetAudioDevice('PI:HDMI')
@@ -277,4 +283,4 @@ class App:
         self.dispatcher.addHandler('/srv/system', SystemHandler(self))
 
     def processRequest(self, req_handler):
-        return self.dispatcher.dispatchUrl(req_handler.request.uri)
+        return self.dispatcher.dispatchUrl(req_handler.request.uri, req_handler=req_handler)

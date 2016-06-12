@@ -13,9 +13,12 @@ class YouTube(ServiceConnection):
     def __init__(self):
         ServiceConnection.__init__(self, YOUTUBE_HOST, https=True)
 
-    def search(self, q):
+    def search(self, q, token = None):
         vars = {"part": "id,snippet", "q": q,
-                "maxResults": 10}
+                "type":"video",
+                "maxResults": 2}
+        if token:
+            vars["pageToken"] = token
         url = self.buildUrl("search", vars)
         return json.loads(self.getData(url))
 
@@ -27,4 +30,7 @@ class YouTube(ServiceConnection):
 if __name__ == "__main__":
     yt = YouTube()
     res = yt.search("eminem")
+    print(json.dumps(res, indent=1))
+    token = res["nextPageToken"]
+    res = yt.search("eminem", token)
     print(json.dumps(res, indent=1))

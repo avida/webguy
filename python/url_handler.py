@@ -17,17 +17,16 @@ class UrlDispatcher:
                 d[url[0]] = {}
             self.__addHandler(d[url[0]], url[1:], hndlr)
 
-    def dispatchUrl(self, url):
-        return self.__dispathUrl(self.url_map, url.split('/')[1:])
-
-    def __dispathUrl(self, d, url):
-        if not url or not url[0] in d:
-            return "Not Found"
-        next_map = d[url[0]]
-        if hasattr(next_map, '__call__'):
-            return next_map(url[1:])
-        else:
-            return self.__dispathUrl(next_map, url[1:])
+    def dispatchUrl(self, url, req_handler=None):
+        def __dispathUrl(self, d, url):
+            if not url or not url[0] in d:
+                return "Not Found"
+            next_map = d[url[0]]
+            if hasattr(next_map, '__call__'):
+                return next_map(url[1:], handler=req_handler)
+            else:
+                return __dispathUrl(self, next_map, url[1:])
+        return __dispathUrl(self, self.url_map, url.split('/')[1:])
 
 
 class UrlHandler:
@@ -35,8 +34,8 @@ class UrlHandler:
     def __init__(self):
         pass
 
-    def __call__(self, params):
-        return "object called: " + str(params)
+    def __call__(self, params, **kwargs):
+        return "object called: " + str(params) +"kwargs: " + str(kwargs)
 
 if __name__ == "__main__":
     dispathcer = UrlDispatcher()
@@ -46,3 +45,4 @@ if __name__ == "__main__":
     print(str(dispathcer.url_map))
     print(dispathcer.dispatchUrl("/www/srv/dd"))
     print(dispathcer.dispatchUrl("/sdf/svv/wefefrv/sdf?gfg"))
+    print(dispathcer.dispatchUrl("/sdf/svv/wefefrv/sdf?gfg&dfk=ddf&para=12"))

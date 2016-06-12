@@ -286,14 +286,15 @@ $('#btn-youtube').bind('click',function(event, ui){
 
 function searchDone(data)
 {
-    var list = JSON.parse(data)
+    var searchResult = JSON.parse(data)
+    items = searchResult["items"]
     $('#youtube-search-res').empty()
-   for (item in list ){
-      var video_id = list[item][0]
-      var title = list[item][1]
-      var image = list[item][2]
+   for (item in items){
+      var video_id = items[item][0]
+      var title = items[item][1]
+      var image = items[item][2]
       var date_exp = /(.*)T.*/g
-      var date = date_exp.exec(list[item][3])[1]
+      var date = date_exp.exec(items[item][3])[1]
       $('#youtube-search-res').append(format('<li class="video" videoId="%s" ><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [video_id, image, title, date ]))
       }
    $('#youtube-search-res').listview('refresh')
@@ -319,6 +320,15 @@ $("#search-form").on("submit", function(){
     $.get('srv/youtube/search/'+val, searchDone)
     return false
 })
+
+$("#youtube-btn-prev").on("click", function(){
+    window.alert("prev!!")
+})
+
+$("#youtube-btn-next").on("click", function(){
+    window.alert("next!!")
+})
+
 // ------------------Music staff------------------//
 var music_path = []
 
