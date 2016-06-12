@@ -3,13 +3,16 @@ from utils import runCommand
 import re
 vol_re = re.compile('\sMono.+\[(\d+)%\]')
 amixer_vol_template = "amixer set PCM {}%"
+
+
 class MOCP:
-    def __init__(self): 
+
+    def __init__(self):
         self.vol = MOCP.volume()
 
     def parseVolume(out):
         s = vol_re.search(out)
-        if s:  
+        if s:
             return int(s.group(1))
         return -1
 
@@ -21,18 +24,18 @@ class MOCP:
         return MOCP.parseVolume(cmd_out[0].decode("ascii"))
 
     def volumeUp(self):
-        if self.vol== -1:
-            self.vol= MOCP.volume()
-        out = MOCP.setVolume(self.vol+1)
+        if self.vol == -1:
+            self.vol = MOCP.volume()
+        out = MOCP.setVolume(self.vol + 1)
         self.vol = MOCP.parseVolume(out)
 
     def volumeDown(self):
-        if self.vol== -1:
-            self.vol= MOCP.volume()
-        out = MOCP.setVolume(self.vol-1)
+        if self.vol == -1:
+            self.vol = MOCP.volume()
+        out = MOCP.setVolume(self.vol - 1)
         self.vol = MOCP.parseVolume(out)
 
-    def setVolume(val): 
+    def setVolume(val):
         return runCommand(amixer_vol_template.format(val))[0].decode("ascii")
 
     def getCurrentTitle():

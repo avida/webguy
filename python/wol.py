@@ -15,19 +15,25 @@ import time
 BROADCAST_IP = '255.255.255.255'
 DEFAULT_PORT = 9
 new_intel = '00:1C:C0:05:F2:63'
+
+
 class WOLThread(threading.Thread):
-   def __init__(self):
-      threading.Thread.__init__(self)
-      self.stop=False
-      self.mac = new_intel
-      self.daemon = True
-   def Stop(self):
-      self.stop = True
-   def run(self):
-      time.sleep(3)
-      if not self.stop:
-         send_magic_packet(self.mac)
-         print('sending wol packet')
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.stop = False
+        self.mac = new_intel
+        self.daemon = True
+
+    def Stop(self):
+        self.stop = True
+
+    def run(self):
+        time.sleep(3)
+        if not self.stop:
+            send_magic_packet(self.mac)
+            print('sending wol packet')
+
 
 def create_magic_packet(macaddress):
     """

@@ -9,14 +9,17 @@ drible_host = "api.dirble.com"
 url_template = "/v2/stations?page=%d&per_page=%d&token=%s"
 station_template = "/v2/station/%d?token=%s"
 
+
 class DirbleConnection:
+
     def __init__(self, host):
         self.host = host
         self.c = None
         self.pages = None
-    def getData(self, req): 
+
+    def getData(self, req):
         if not self.c:
-            print("connecting " , self.host)
+            print("connecting ", self.host)
             self.c = http.client.HTTPConnection(self.host)
             print("connected")
         self.c.request("GET", req)
@@ -35,8 +38,10 @@ class DirbleConnection:
             return "{'error':'bad response %d'}" % resp.status
         else:
             return resp.read().decode("utf-8")
-            
+
+
 class Dirble(ServiceConnection):
+
     def __init__(self):
         ServiceConnection.__init__(self, drible_host, https=True)
         self.current_page = 1
@@ -46,17 +51,17 @@ class Dirble(ServiceConnection):
 
     def createRequest(self):
         return url_template % (self.current_page, items_per_page, token)
-   
+
     def createGetStationRequest(self, station_id):
         return station_template % (station_id, token)
 
     def loadList(self):
-        lst, hdrs = self.getData(self.createRequest(), withHeaders = True)
+        lst, hdrs = self.getData(self.createRequest(), withHeaders=True)
         lst = json.loads(lst)
         if not self.pages:
             self.pages = hdrs['X-Total-Pages']
         if len(lst) != 0:
-           self.cache = lst
+            self.cache = lst
         return lst
 
     def getStationInfo(self, station_id):
@@ -68,13 +73,13 @@ class Dirble(ServiceConnection):
 
     def NextPage(self):
         if self.pages and self.current_page < self.pages:
-            self.current_page +=1
-            return True 
+            self.current_page += 1
+            return True
         return False
 
     def PrevPage(self):
         if self.current_page > 1:
-            self.current_page -=1
+            self.current_page -= 1
             return True
         else:
             return False

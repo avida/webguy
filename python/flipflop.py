@@ -218,6 +218,7 @@ class OutputStream(object):
     result in Records being sent back to the server.
 
     """
+
     def __init__(self, conn, req, type, buffered=False):
         self._conn = conn
         self._req = req
@@ -288,7 +289,7 @@ def decode_pair(string, position=0):
     name_length = string[position]
     if name_length & 128:
         name_length = struct.unpack(
-            '!L', string[position:position+4])[0] & 0x7fffffff
+            '!L', string[position:position + 4])[0] & 0x7fffffff
         position += 4
     else:
         position += 1
@@ -296,14 +297,14 @@ def decode_pair(string, position=0):
     value_length = string[position]
     if value_length & 128:
         value_length = struct.unpack(
-            '!L', string[position:position+4])[0] & 0x7fffffff
+            '!L', string[position:position + 4])[0] & 0x7fffffff
         position += 4
     else:
         position += 1
 
-    name = string[position:position+name_length]
+    name = string[position:position + name_length]
     position += name_length
-    value = string[position:position+value_length]
+    value = string[position:position + value_length]
     position += value_length
 
     return (position, (name, value))
@@ -336,6 +337,7 @@ class Record(object):
     Used for encoding/decoding records.
 
     """
+
     def __init__(self, fcgi_type=FCGI_UNKNOWN_TYPE,
                  request_id=FCGI_NULL_REQUEST_ID):
         self.version = FCGI_VERSION_1
@@ -439,6 +441,7 @@ class Request(object):
     stderr, and data are free for your handler's use.
 
     """
+
     def __init__(self, conn):
         self._conn = conn
 
@@ -483,6 +486,7 @@ class Connection(object):
     the FastCGI message processing for that socket.
 
     """
+
     def __init__(self, sock, addr, server):
         self._sock = sock
         self._addr = addr
@@ -638,6 +642,7 @@ class ThreadPool(object):
     by max_threads.
 
     """
+
     def __init__(self, min_spare=1, max_spare=5, max_threads=sys.maxsize):
         self._min_spare = min_spare
         self._max_spare = max_spare
