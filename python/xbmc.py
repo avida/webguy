@@ -130,7 +130,7 @@ if __name__ == "__main__":
     elif "play" in sys.argv:
         js = xbmc.StartPlaylist(1)
     elif "list" in sys.argv:
-        js = xbmc.GetPlayListItems(0)
+        js = xbmc.GetPlayListItems(1)
     elif "lists" in sys.argv:
         js = xbmc.GetPlayLists()
     elif "info" in sys.argv:

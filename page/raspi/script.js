@@ -283,19 +283,23 @@ $('#btn-youtube').bind('click',function(event, ui){
 
 })
 
-
+var q;
+var nextToken;
+var prevToken;
 function searchDone(data)
 {
     var searchResult = JSON.parse(data)
+    nextToken = searchResult.nextToken ? searchResult.nextToken : 0;
+    prevToken = searchResult.prevToken ? searchResult.prevToken: 0;
     items = searchResult["items"]
     $('#youtube-search-res').empty()
    for (item in items){
-      var video_id = items[item][0]
-      var title = items[item][1]
-      var image = items[item][2]
+      var video_id = items[item]["id"]
+      var title = items[item]["title"]
+      var image = items[item]["thumbnail"]
       var date_exp = /(.*)T.*/g
-      var date = date_exp.exec(items[item][3])[1]
-      $('#youtube-search-res').append(format('<li class="video" videoId="%s" ><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [video_id, image, title, date ]))
+      var date = date_exp.exec(items[item]["published"])[1]
+      $('#youtube-search-res').append(format('<li class="video" Id="%s" ><img class="game-thumb" src="%s">%s<span class="ui-li-count">%s</span></li>', [video_id, image, title, date ]))
       }
    $('#youtube-search-res').listview('refresh')
 }
@@ -306,27 +310,36 @@ function itemOpened(data)
 }
 
 $('#youtube-search-res').on('click', 'li', function(){
+   searchType = $("input[name=searchtype]:checked").val()
    var item = $(this).html()
-   var video_id  = this.getAttribute('videoId')
+   var id = this.getAttribute('Id')
    $.mobile.loading("show",{ 
-      text:'Opening video',
+      text:'Opening video/playlist',
       textVisible:true 
       })
-   $.get('srv/youtube/play/'+video_id, itemOpened)
+   if (searchType == "video")
+      $.get('srv/youtube/play/'+ id, itemOpened)
+   else
+      $.get('srv/youtube/playlist/'+ id, itemOpened)
 })
 
 $("#search-form").on("submit", function(){
-    var val  =  $("#video-search").val()
-    $.get('srv/youtube/search/'+val, searchDone)
+    q =  $("#video-search").val()
+   searchType = $("input[name=searchtype]:checked").val()
+    $.get('srv/youtube/search/'+q, {"type":searchType}, searchDone)
     return false
 })
 
+function changePage(token) {
+   searchType = $("input[name=searchtype]:checked").val()
+   $.get('srv/youtube/search/'+q, {"token":token, "type": searchType}, searchDone)
+}
 $("#youtube-btn-prev").on("click", function(){
-    window.alert("prev!!")
+   changePage(prevToken)
 })
 
 $("#youtube-btn-next").on("click", function(){
-    window.alert("next!!")
+   changePage(nextToken)
 })
 
 // ------------------Music staff------------------//

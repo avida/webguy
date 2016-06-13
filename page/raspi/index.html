@@ -116,11 +116,19 @@
    </form>
    <ul data-role="listview" id="youtube-search-res">
    </ul>
-    <fieldset class="ui-grid-a">
-    <div class="ui-block-a"><button  type="button" id="youtube-btn-prev"><<<<</button></div>
-    <div class="ui-block-b"><button  type="button" id="youtube-btn-next">>>>></button></div>
-    </fieldset>
-    </div> <!-- youtube browser page -->
+   <fieldset class="ui-grid-a">
+   <div class="ui-block-a"><button  type="button" id="youtube-btn-prev"><<<<</button></div>
+   <div class="ui-block-b"><button  type="button" id="youtube-btn-next">>>>></button></div>
+   </fieldset>
+   <form lpformnum="10">
+      <fieldset data-role="controlgroup" data-type="horizontal">
+         <input name="searchtype" id="videos" value="video" checked type="radio"/>
+         <label for="videos">Videos</label>
+         <input name="searchtype"id="playlists" value="playlist" type="radio"/>
+         <label for="playlists">Playlist</label>
+      </fieldset>
+   </form>
+   </div> <!-- youtube browser page -->
 
 <div data-role="page" id="music-page" data-theme="a">
    <div data-role="header" id="music-hdr">
@@ -183,25 +191,23 @@ function initStatus(data){
 
 function updateInfo(data){
    var pos_info = JSON.parse(data)
-   if (pos_info.error) {
-       console.log("Error getting info: " + pos_info.error)
-       return;
+   if (!pos_info.error) {
+       $("#player-info").html(format("%s:%s:%s - %s:%s:%s  %s",
+                             [pos_info["totaltime"]["hours"],
+                              timeDigitToString(pos_info["totaltime"]["minutes"]),
+                              timeDigitToString(pos_info["totaltime"]["seconds"]),
+                              pos_info["time"]["hours"],
+                              timeDigitToString(pos_info["time"]["minutes"]),
+                              timeDigitToString(pos_info["time"]["seconds"]),
+                              pos_info["label"]
+                              ]))
+        var slider = $('#pos-slider')
+        slider.val(pos_info["percentage"])
+        slider.slider('refresh')
    }
-   $("#player-info").html(format("%s:%s:%s - %s:%s:%s  %s",
-                         [pos_info["totaltime"]["hours"],
-                          timeDigitToString(pos_info["totaltime"]["minutes"]),
-                          timeDigitToString(pos_info["totaltime"]["seconds"]),
-                          pos_info["time"]["hours"],
-                          timeDigitToString(pos_info["time"]["minutes"]),
-                          timeDigitToString(pos_info["time"]["seconds"]),
-                          pos_info["label"]
-                          ]))
-    var slider = $('#pos-slider')
-    slider.val(pos_info["percentage"])
-    slider.slider('refresh')
-    setTimeout(function(){
-      $.get('srv/player/info',updateInfo);
-       },1500)
+   setTimeout(function(){
+       $.get('srv/player/info',updateInfo);
+   },1500)
 }
 
 $(document).ready( function(){

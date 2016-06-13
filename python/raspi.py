@@ -223,14 +223,21 @@ class YouTubeHandler:
         print(kwargs["handler"].request.body)
         if command == "search":
             val = urllib.parse.unquote(params[1])
+            url = urllib.parse.urlparse(val)
+            queryParams = urllib.parse.parse_qs(url.query)
             try:
-                js = self.yt.search(val)
-            except Exception:
-                return "not ok"
-            items = [[x["id"]["videoId"],
-                      x["snippet"]["title"],
-                      x["snippet"]["thumbnails"]["medium"]["url"],
-                      x["snippet"]["publishedAt"]] for x in js["items"] if x["id"]["kind"] == "youtube#video"]
+                js = self.yt.search(url.path, 
+                     token = queryParams.get("token",[None])[0],
+                     type =  queryParams.get("type", ["video"])[0])
+            except Exception as e:
+                return "not ok: " + str(e)
+            items = [{"id": x["id"]["playlistId"] if "playlistId" in x["id"] else x["id"]["videoId"],
+                      "title": x["snippet"]["title"],
+                      "thumbnail": x["snippet"]["thumbnails"]["medium"]["url"],
+                      "published": x["snippet"]["publishedAt"]}
+                      for x in js["items"] 
+                      if x["id"]["kind"] == "youtube#video" or 
+                         x["id"]["kind"] == "youtube#playlist"]
             res = {"items": items}
             if "nextPageToken" in js:
                 res["nextToken"] = js["nextPageToken"]
@@ -241,6 +248,13 @@ class YouTubeHandler:
         elif command == "play":
             try:
                 self.app.xbmc.openYoutubeVideo(params[1])
+                return "ok"
+            except IndexError:
+                return "not ok"
+        elif command == "playlist":
+            try:
+                self.app.xbmc.openYoutubeList(params[1])
+                self.app.xbmc.StartPlaylist(1)
                 return "ok"
             except IndexError:
                 return "not ok"

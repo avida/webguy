@@ -13,12 +13,15 @@ class YouTube(ServiceConnection):
     def __init__(self):
         ServiceConnection.__init__(self, YOUTUBE_HOST, https=True)
 
-    def search(self, q, token = None):
+    def search(self, q, token = None, type = None):
         vars = {"part": "id,snippet", "q": q,
-                "type":"video",
-                "maxResults": 2}
+                "maxResults": 5}
+        if type:
+            vars["type"] = type
+        print(type)
         if token:
             vars["pageToken"] = token
+        print(str(vars))
         url = self.buildUrl("search", vars)
         return json.loads(self.getData(url))
 
