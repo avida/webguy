@@ -41,10 +41,10 @@ class SchedulerSettings:
 
 class Scheduler (threading.Thread):
 
-    def __init__(self):
+    def __init__(self, ut_time = time.time):
         threading.Thread.__init__(self)
         self.setDaemon(True)
-        self.s = sched.scheduler(time.time, time.sleep)
+        self.s = sched.scheduler(ut_time, time.sleep)
         self.settings = SchedulerSettings()
         self.settings.Load()
         self.LoadSettings()
@@ -112,6 +112,7 @@ class Action:
 
 
 class TimePattern:
+
     def __init__(self, **kwargs):
         self.tuple_format = ("year","month","day","hour", "minute")
         self.tuple_index  = dict(zip(self.tuple_format, range(0, len(self.tuple_format))))
@@ -225,7 +226,6 @@ class RepetativePattern:
         for date in self.at:
             event = date.getSignificantTimeDelta(current_time)
             upcoming_events.append(event)
-        print(upcoming_events)
         upcoming_events.sort()
         return upcoming_events[0]
 
@@ -234,7 +234,7 @@ class RepetativeEvent:
     def __init__(self, scheduler):
         self.sched = scheduler
 
-    def Schedule(self, pattern, f):
+    def schedule(self, pattern, f):
         self.f = f
         self.pattern = pattern
 
@@ -243,7 +243,11 @@ class RepetativeEvent:
         self.reschedule()
         pass
 
-    def Reschedule(self):
+    def reschedule(self):
+        nextEventIn = self.pattern.UpcomingEvent(datetime.datetime.now())
+        sched.enterFromDate(datetime.datetime.now() + nextEventIn)
+
+    def serialize(self):
         pass
 
 
@@ -256,21 +260,41 @@ def print_time(id, **kwargs):
 def print_datetime(arg, **kwargs):
     print("datetime: " + arg)
 
+
 if __name__ == "__main__":
     import unittest
 
-    @unittest.skip("longest test")
+    def makeDate(str):
+        return datetime.datetime.strptime(str, "%d/%m/%Y %H:%M")
+
+    class UTTime:
+        def __init__(self, times = None):
+            if not times:
+                times = list(range(0,9))
+            self.times = times
+
+        def __call__(self):
+            print ("invoke")
+            return self.times.pop(0)
+
     class SchedulerTest(unittest.TestCase):
 
+        @Action("SchedulerTest.scheduler_cb")
+        def scheduler_cb(test, **kwargs):
+            print ("testset!!!")
+
+        @RepetativeEvent("SchedulerTest.repetative_cb")
+        def repetative_cb(tst, **kwargs):
+            print("repetative cb")
+
         def test_sched(self):
-            print(time.time())
-            a = Scheduler()
-            a.enter(4, print_time, 5, he="heee")
+            a = Scheduler(ut_time = UTTime())
+            a.enter(4, SchedulerTest.scheduler_cb, 5, he="heee")
             print(a.list)
             #a.enterFromDate(datetime.datetime.now() + datetime.timedelta(hours=3), print_datetime, "alaram!!", other="oth" )
             try:
                 a.start()
-                time.sleep(10)
+                time.sleep(5)
             except KeyboardInterrupt:
                 print("interrupted")
             finally:
@@ -291,15 +315,14 @@ if __name__ == "__main__":
 
     class RepetativePatternTest(unittest.TestCase):
 
-        test_time = datetime.datetime(year=2016, month=10, day=20, hour=22)
-        test_time_month_end = datetime.datetime(year=2016, month=10, day=31, hour=22)
-        test_time_eoy = datetime.datetime(year=2016, month=12, day=31, hour = 23)
+        test_time = makeDate("20/10/2016 22:00")
+        test_time_month_end = makeDate("31/10/2016 22:00")
+        test_time_eoy = makeDate("31/12/2016 23:00")
 
         def test_pattern(self):
             print("repetative pattern test")
             pattern = RepetativePattern(datetime.datetime.now() - timedelta(hours=5,minutes=59, seconds=13))
             pattern.EveryHour(4)
-            print (pattern.UpcomingEvent(datetime.datetime.now()))
 
         def test_date(self):
             print("test date")
@@ -329,9 +352,9 @@ if __name__ == "__main__":
 
     class TimePatternTest(unittest.TestCase):
 
-            curr_time = datetime.datetime(year=2016, month=10, day=20, hour=22)
-            curr_time_end_of_month = datetime.datetime(year=2016, month=10, day=31, hour=22)
-            curr_time_end_of_year = datetime.datetime(year=2016, month=12, day=31, hour=22)
+            curr_time = makeDate("20/10/2016 22:00")
+            curr_time_end_of_month = makeDate("31/10/2016 22:00")
+            curr_time_end_of_year = makeDate("31/12/2016 22:00")
 
             def test_basic(self):
                 print ("Time pattern test")
@@ -394,6 +417,5 @@ if __name__ == "__main__":
                 p = TimePattern(hour=22)
                 anch = p.getAnchorDate(TimePatternTest.curr_time_end_of_year, future = "day")
                 self.assertEqual(datetime.datetime(year=2017, month=1, day=1, hour=22), anch)
-                print("anch: ", anch)
 
     unittest.main()
