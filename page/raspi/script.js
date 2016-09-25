@@ -405,3 +405,25 @@ $('#btn-system').on('click', function(event, ui){
    $.get('/srv/system/info', updateSystemInfo)
 
 })
+//-------------------------/
+$('#btn-playlist').on('click', function(event,ui){
+$.get('/srv/player/playlist', function(data){
+   var list = JSON.parse(data)
+   var items = list["items"]
+   var plItems = $("#playlist-items")
+   plItems.empty()
+   for (item in items){
+      var el = $('<li>', { pos:item}).html(items[item]['label'])
+      plItems.append(el)
+   }
+   plItems.listview()
+   plItems.listview('refresh')
+   $('#playlist-items').on('tap', 'li', function(){
+      var item = $(this).attr('pos')
+     $.get('srv/player/goto/'+ item)
+
+   })
+   $("#playlistPopup").popup()
+   $("#playlistPopup").popup("open")
+})
+})

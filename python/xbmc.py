@@ -59,6 +59,11 @@ class XBMC:
                 return resp
         return {}
 
+    def Goto(self, pos):
+        def _Goto(self):
+            return self.rpc.method("Player.GoTo", {"playerid": self.activePlayerId, "to": pos})
+        return self.DoWithPlayerId(_Goto)
+
     def PlayPause(self):
         def _PlayPause(self):
             return self.rpc.method("Player.PlayPause", {"playerid": self.activePlayerId})
@@ -128,9 +133,9 @@ if __name__ == "__main__":
     if "clear" in sys.argv:
         js = xbmc.ClearPlaylist(0)
     elif "play" in sys.argv:
-        js = xbmc.StartPlaylist(1)
+        js = xbmc.StartPlaylist(0)
     elif "list" in sys.argv:
-        js = xbmc.GetPlayListItems(1)
+        js = xbmc.GetPlayListItems(0)
     elif "lists" in sys.argv:
         js = xbmc.GetPlayLists()
     elif "info" in sys.argv:
@@ -155,6 +160,9 @@ if __name__ == "__main__":
         js = xbmc.openYoutubeList("PL4B999A7ABBB327A1")
     elif "twitch" in sys.argv:
         js = xbmc.openTwitchStream("Miramisu")
+    elif "goto" in sys.argv:
+        js = xbmc.Goto(1)
+    print(js)
     print(js)
     print(json.dumps(js, indent=2))
     #js = rpc.method("Files.GetDirectory",{"directory":"/mnt/nfs/.hidden","properties":["size"]} )

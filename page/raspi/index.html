@@ -62,6 +62,7 @@
 <button  value="System" type="button" id="btn-system"><img src="img/system.png"></button>
 </div>
 </div>
+<button  value="Playlist" type="button" id="btn-playlist"><img src="">Playlist</button>
 <div data-role="collapsible">
 <h4><img src="img/tv.png"/></h4>
    <div class="ui-grid-a">
@@ -254,5 +255,10 @@ if (document.URL.search('#system-page')!= -1)
    $.get('/srv/system/info', updateSystemInfo)
 });
 </script>
+<div data-role="popup" id="playlistPopup" data-theme="b">
+<ul data-role="listview" data-inet="true" id="playlist-items">
+   <li data-role="list-divider">Chose song</li>
+</ul>
+</div>
 </body>
 </html>

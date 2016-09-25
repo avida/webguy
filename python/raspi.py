@@ -151,6 +151,7 @@ class PlayerHandler:
 
     def __call__(self, params, **kwargs):
         command = params[0]
+        print (command)
         if command == "forward":
             self.app.xbmc.Seek("smallforward")
         elif command == "pplay":
@@ -174,6 +175,13 @@ class PlayerHandler:
                 self.app.xbmc.setVolume(val)
                 return "ok"
             return "invalid request"
+        elif command == "playlist":
+            js = self.app.xbmc.GetPlayListItems(0)
+            return json.dumps(js["result"])
+        elif command == "goto":
+            pos = params[1]
+            js = self.app.xbmc.Goto(int(pos))
+            return json.dumps(js)
         return "ok"
 
     def playerInfo(self):
