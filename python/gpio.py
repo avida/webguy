@@ -1,10 +1,13 @@
 #!/usr/bin/python3
+# How to install RPi module:
+# sudo apt-get install python3-rpi.gpio
+
+
 try:
     import RPi.GPIO as GPIO
 except ImportError:
     print("Cannot import GPIO")
 PORT = 4
-
 
 class RaspiGPIOOut:
 

@@ -18,7 +18,7 @@ do_start()
 {
   echo "Starting service"
   cd $WEBGUY_WD
-  ./server.py raspi 2>&1 > /dev/null &
+  ./server.py --app raspi 2>&1 > /dev/null &
 }
 
 do_stop()
