@@ -3,6 +3,7 @@ import http.client
 from web_backend import ServiceConnection
 from urllib.parse import urlparse
 import json
+from utils import Singleton
 token = "3954ccb7fcb40fe2612c15457f"
 items_per_page = 10
 drible_host = "api.dirble.com"
@@ -40,7 +41,7 @@ class DirbleConnection:
             return resp.read().decode("utf-8")
 
 
-class Dirble(ServiceConnection):
+class Dirble(ServiceConnection, metaclass = Singleton):
 
     def __init__(self):
         ServiceConnection.__init__(self, drible_host, https=True)

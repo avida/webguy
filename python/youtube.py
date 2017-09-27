@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from web_backend import ServiceConnection
+from utils import Singleton
 import urllib.parse
 import json
 
@@ -7,7 +8,7 @@ DEV_KEY = "AIzaSyDaMq7oWT-ZSTAGswiNwCLh864QhL9dfUw"
 YOUTUBE_HOST = "content.googleapis.com"
 API_PATH = 'youtube/v3/'
 
-class YouTube(ServiceConnection):
+class YouTube(ServiceConnection, metaclass = Singleton):
 
     def __init__(self):
         ServiceConnection.__init__(self, YOUTUBE_HOST, https=True)

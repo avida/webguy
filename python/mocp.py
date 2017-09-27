@@ -1,11 +1,11 @@
 #!/usr/bin/python
-from utils import runCommand
+from utils import runCommand, Singleton
 import re
 vol_re = re.compile('\sMono.+\[(\d+)%\]')
 amixer_vol_template = "amixer set PCM {}%"
 
 
-class MOCP:
+class MOCP(metaclass = Singleton):
 
     def __init__(self):
         self.vol = MOCP.volume()

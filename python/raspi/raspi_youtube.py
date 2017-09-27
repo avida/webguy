@@ -1,12 +1,16 @@
 from flask_raspi import app
 from flask import abort, request
 import urllib.parse
+from xbmc import XBMC
 import json
 from youtube import YouTube
+from utils import ConnectionRefusedHandler
 
 yt = YouTube()
+xbmc = XBMC()
 
 @app.route("/youtube/search/<string:query>")
+@ConnectionRefusedHandler
 def youtubeSearch(query):
     try:
         js = yt.search(query, 
@@ -32,6 +36,7 @@ def youtubeSearch(query):
     return result
 
 @app.route('/youtube/<string:action>/<string:value>')
+@ConnectionRefusedHandler
 def youtubeAction(action, value):
     if action == "play":
         try:

@@ -118,6 +118,13 @@ def ConnectionRefusedHandler(f):
 def makeErrorResponse(msg):
     return json.dumps({'error': str(msg)})
 
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+        
 if __name__ == "__main__":
     browser = FileBrowser("./")
     print(browser.processItemOnFS('.'))

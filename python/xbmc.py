@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import json
 from web_backend import ServiceConnection
+from utils import Singleton
 
 
 class JsonRPC:
@@ -18,7 +19,7 @@ class JsonRPC:
         return json.loads(resp)
 
 
-class XBMC:
+class XBMC(metaclass = Singleton):
 
     def __init__(self):
         self.rpc = JsonRPC()
