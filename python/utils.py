@@ -104,10 +104,20 @@ def SystemUptime():
     uptime = getTimedelta(uptime)
     return uptime
 
+def ConnectionRefusedHandler(f):
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except ConnectionRefusedError:
+            return makeErrorResponse("no connection  :(")
+    # flask url dispatcher relies on __name__ attribute
+    # to make sure request handler is unique
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+def makeErrorResponse(msg):
+    return json.dumps({'error': str(msg)})
+
 if __name__ == "__main__":
-    SystemUptime()
-    exit(0)
-    browser = FileBrowser("/mnt/nfs")
-    while True:
-        print(browser.processItemOnFS('.'))
-        time.sleep(1)
+    browser = FileBrowser("./")
+    print(browser.processItemOnFS('.'))

@@ -1,9 +1,11 @@
 from flask_raspi import app
+from flask import abort
 from gpio import RaspiGPIOOut
 from xbmc import XBMC
-from utils import FileBrowser, SystemUptime
+from utils import FileBrowser, SystemUptime, ConnectionRefusedHandler
 import urllib.parse
 import html
+import os
 import pathlib
 xbmc = XBMC()
 
@@ -22,9 +24,10 @@ def socket(socket, action, value = None):
         return str(p.getValue())
     return "Unknown command"
 
-@app.route("/browse")
-@app.route("/browse/<string:path>")
-def browse(path =  './'):
+@app.route("/music")
+@app.route("/music/<string:path>")
+@ConnectionRefusedHandler
+def musicBrowse(path =  './'):
     browser = FileBrowser('./')
     path = urllib.parse.unquote('/'.join(path))
     path = html.unescape(browser.dir_path + '/' + path)
@@ -44,3 +47,38 @@ def browse(path =  './'):
     except FileBrowser.NotADirException:
         return "not a dir"
 
+@app.route("/browse/")
+@app.route("/browse/<path:path>")
+@ConnectionRefusedHandler
+def fsBrowse(path = './'):
+    browser = FileBrowser('./')
+    try:
+        path = html.unescape(path)
+        return browser.processItemOnFS(path)
+    except AttributeError:
+        pass
+    except FileBrowser.NotADirException:
+        path = os.path.normpath(browser.dir_path + '/' + path)
+        print(path)
+        xbmc.Open(path)
+    return "ok"
+
+@app.route('/system/<string:action>')
+@ConnectionRefusedHandler
+def systemAction(action):
+
+    def GetSystemInfo(self):
+        info = {}
+        info["uptime"] = str(SystemUptime())
+        return info
+
+    if action == 'hdmi':
+        xbmc.SetAudioDevice('PI:HDMI')
+    elif action == 'analog':
+        xbmc.SetAudioDevice('PI:Analogue')
+    elif action == 'info':
+        return GetSystemInfo()
+    else:
+        abort(404)
+
+    

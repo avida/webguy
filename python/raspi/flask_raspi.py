@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect 
 
 app = Flask("raspi", 
             static_folder='../page/',
@@ -6,7 +6,8 @@ app = Flask("raspi",
 
 import raspi_media
 import raspi_system
+import raspi_youtube
 
-@app.route("/s")
+@app.route("/")
 def root():
-    return "sdfs"
+    return redirect("/raspi/index.html")

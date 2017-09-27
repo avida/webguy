@@ -115,18 +115,18 @@ $('#lst-dir').on('click', 'li', function(){
    if (item == '..'){
       path.pop()
       $('#lst-dir').empty().listview("refresh")
-      $.get('srv/browse/'+ path.join('/'), browseHandle)
+      $.get('/browse/'+ path.join('/'), browseHandle)
       return  
    }
    last_position = $(window).scrollTop()
    if (!isDir){
       var filename = this.getAttribute('filename')
-      $.get('srv/browse/'+path.join('/')+'/'+filename , itemLoaded)
+      $.get('/browse/'+path.join('/')+'/'+filename , itemLoaded)
    } else {
       var id = title_to_info[item]
       path.push(item)
       $('#lst-dir').empty().listview("refresh")
-      $.get('srv/browse/'+path.join('/'), browseHandle)
+      $.get('/browse/'+path.join('/'), browseHandle)
    }
 })
 
@@ -136,7 +136,7 @@ $("#btn-browse").bind("click", function(event, ui){
       text:'/',
       textVisible:true 
       })
-   $.get('srv/browse/'+path.join('/'), browseHandle)
+   $.get('/browse/'+path.join('/'), browseHandle)
 })
 //-----------------Radio station-------------------------//
 var current_page = 1
@@ -164,27 +164,27 @@ function stationsLoaded(data)
 $('#lst-stations').on('click', 'li', function(){
    var item = $(this).html()
     var st_id = this.getAttribute('st_id')
-    $.get('srv/radio/play/' + st_id )
+    $.get('/radio/play/' + st_id )
 
 })
 
 $('#btn-stations').bind('click', function(event, ui){
    window.open('#stations', '_self')
-   $.get('srv/radio/page/'+current_page, stationsLoaded)
+   $.get('/radio/page/'+current_page, stationsLoaded)
 
 })
 
 $('#btn-prev').bind('click', function(event, ui){
     if(current_page > 1){
-        $.get('srv/radio/page/' + --current_page, stationsLoaded)
+        $.get('/radio/page/' + --current_page, stationsLoaded)
     }
 })
 $('#btn-next').bind('click', function(event, ui){
-    $.get('srv/radio/page/' + ++current_page, stationsLoaded)
+    $.get('/radio/page/' + ++current_page, stationsLoaded)
 })
 
 $('#btn-stop').bind('click', function(event, ui){
-    $.get('srv/radio/stop')
+    $.get('/radio/stop')
 })
 //-----------------Twitch  -------------------------//
 var twitch_page = 0
@@ -230,7 +230,7 @@ $("#btn-browse-twitch").bind("click", function(event, ui){
       text:'/',
       textVisible:true 
       })
-   $.get('srv/twitch/games/' + games_page, twitchGamesHandle)
+   $.get('/twitch/games/' + games_page, twitchGamesHandle)
 })
 
 $('#twitch-lst-dir').on('click', 'li', function(){
@@ -239,11 +239,11 @@ $('#twitch-lst-dir').on('click', 'li', function(){
       var game = this.getElementsByClassName('game-title')[0].innerHTML
       current_game = game
       $('#twitch-browser-hdr').text(game)
-      $.get(format('srv/twitch/search/%s/%s', [game, twitch_page]), twitchStreamHandle )
+      $.get(format('/twitch/search/%s/%s', [game, twitch_page]), twitchStreamHandle )
 
    } else {
       var url = this.getAttribute('twitch_url')
-      $.get('srv/twitch/play/' + url )
+      $.get('/twitch/play/' + url )
    }
 })
 
@@ -254,11 +254,11 @@ $('#twitch-btn-next').bind('click', function(event, ui){
           })
     if (browseGames){
         games_page++
-        $.get('srv/twitch/games/' + games_page, twitchGamesHandle)
+        $.get('/twitch/games/' + games_page, twitchGamesHandle)
         
     } else{
         twitch_page++
-        $.get(format('srv/twitch/search/%s/%s', [current_game, twitch_page]), twitchStreamHandle )
+        $.get(format('/twitch/search/%s/%s', [current_game, twitch_page]), twitchStreamHandle )
     }
 })
 $('#twitch-btn-prev').bind('click', function(event, ui){
@@ -269,12 +269,12 @@ $('#twitch-btn-prev').bind('click', function(event, ui){
     if (browseGames){
         games_page--
         if (games_page < 0)  games_page = 0
-        $.get('srv/twitch/games/' + games_page, twitchGamesHandle)
+        $.get('/twitch/games/' + games_page, twitchGamesHandle)
         
     } else{
         twitch_page--
         if (twitch_page < 0) twitch_page = 0
-        $.get(format('srv/twitch/search/%s/%s', [current_game, twitch_page]), twitchStreamHandle )
+        $.get(format('/twitch/search/%s/%s', [current_game, twitch_page]), twitchStreamHandle )
     }
 })
 //-----------------Youtube staff -------------------------//
@@ -318,21 +318,21 @@ $('#youtube-search-res').on('click', 'li', function(){
       textVisible:true 
       })
    if (searchType == "video")
-      $.get('srv/youtube/play/'+ id, itemOpened)
+      $.get('/youtube/play/'+ id, itemOpened)
    else
-      $.get('srv/youtube/playlist/'+ id, itemOpened)
+      $.get('/youtube/playlist/'+ id, itemOpened)
 })
 
 $("#search-form").on("submit", function(){
     q =  $("#video-search").val()
    searchType = $("input[name=searchtype]:checked").val()
-    $.get('srv/youtube/search/'+q, {"type":searchType}, searchDone)
+    $.get('/youtube/search/'+q, {"type":searchType}, searchDone)
     return false
 })
 
 function changePage(token) {
    searchType = $("input[name=searchtype]:checked").val()
-   $.get('srv/youtube/search/'+q, {"token":token, "type": searchType}, searchDone)
+   $.get('/youtube/search/'+q, {"token":token, "type": searchType}, searchDone)
 }
 $("#youtube-btn-prev").on("click", function(){
    changePage(prevToken)
@@ -367,7 +367,7 @@ function processMusicItems(data){
 $('#btn-music').bind('click', function(event, ui){
    window.open('#music-page', '_self')
    music_path = []
-   $.get('srv/music', processMusicItems)
+   $.get('/music', processMusicItems)
 })
 
 $('#music-items').on('tap', 'li', function(){
@@ -378,7 +378,7 @@ $('#music-items').on('tap', 'li', function(){
       text:item,
       textVisible:true 
       })
-   $.get('srv/music/'+ item, itemLoaded)
+   $.get('/music/'+ item, itemLoaded)
 
 })
 $('#music-items').on('taphold', 'li', function(){
@@ -397,17 +397,17 @@ function updateSystemInfo(data){
 $('#btn-system').on('click', function(event, ui){
    window.open('#system-page', '_self')
    $('#btn-system-audio-hdmi').on('click', function(event,ui){
-      $.get('srv/system/hdmi')
+      $.get('/system/hdmi')
    })
    $('#btn-system-audio-analog').on('click', function(event,ui){
-      $.get('srv/system/analog')
+      $.get('/system/analog')
    })
-   $.get('/srv/system/info', updateSystemInfo)
+   $.get('/system/info', updateSystemInfo)
 
 })
 //-------------------------/
 $('#btn-playlist').on('click', function(event,ui){
-$.get('/srv/player/playlist', function(data){
+$.get('/player/playlist', function(data){
    var list = JSON.parse(data)
    var items = list["items"]
    var plItems = $("#playlist-items")
@@ -420,7 +420,7 @@ $.get('/srv/player/playlist', function(data){
    plItems.listview('refresh')
    $('#playlist-items').on('tap', 'li', function(){
       var item = $(this).attr('pos')
-     $.get('srv/player/goto/'+ item)
+     $.get('/player/goto/'+ item)
 
    })
    $("#playlistPopup").popup()

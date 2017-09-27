@@ -1,13 +1,13 @@
 <html>
 <head>
 
-<script src="js/jquery.js"></script>
+<script src="/js/jquery.js"></script>
 <!-- <script src="_assets/js/index.js"></script> -->
-<script src="js/jquery.mobile-1.4.5.min.js"></script>
-<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
+<script src="/js/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="/css/themes/default/jquery.mobile-1.4.5.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./common.js"></script>
-<link rel="stylesheet" type="text/css" href="./style.css">
+<script src="/common.js"></script>
+<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
 <div data-role="page" id="main">
@@ -38,33 +38,33 @@
 </fieldset>
 <div class="ui-grid-a">
 <div class="ui-block-a">
-<button  value="Pause/Play" type="button" id="btn-pplay"><img src="img/pplay.png"></button>
+<button  value="Pause/Play" type="button" id="btn-pplay"><img src="/img/pplay.png"></button>
 </div>
 <div class="ui-block-b">
-<button value="Youtube" type="button" id="btn-youtube"><img src="img/youtube.png"/></button>
+<button value="Youtube" type="button" id="btn-youtube"><img src="/img/youtube.png"/></button>
 </div>
 <div class="ui-block-a">
-<button  value="Browse" type="button" id="btn-browse"><img src="img/files.png"></button>
+<button  value="Browse" type="button" id="btn-browse"><img src="/img/files.png"></button>
 </div>
 <div class="ui-block-b">
-<button  value="Browse" type="button" id="btn-browse-twitch"><img src="img/twitch.png"/></button>
+<button  value="Browse" type="button" id="btn-browse-twitch"><img src="/img/twitch.png"/></button>
 </div>
 <div class="ui-block-a">
-<button  value="Radio" type="button" id="btn-stations"><img src="img/radio.png"></button>
+<button  value="Radio" type="button" id="btn-stations"><img src="/img/radio.png"></button>
 </div>
 <div class="ui-block-b">
-<button  value="Music" type="button" id="btn-music"><img src="img/music.png"/></button>
+<button  value="Music" type="button" id="btn-music"><img src="/img/music.png"/></button>
 </div>
 <div class="ui-block-a">
-<button  value="Stop" type="button" id="btn-stop"><img src="img/stop.png"></button>
+<button  value="Stop" type="button" id="btn-stop"><img src="/img/stop.png"></button>
 </div>
 <div class="ui-block-b">
-<button  value="System" type="button" id="btn-system"><img src="img/system.png"></button>
+<button  value="System" type="button" id="btn-system"><img src="/img/system.png"></button>
 </div>
 </div>
 <button  value="Playlist" type="button" id="btn-playlist"><img src="">Playlist</button>
 <div data-role="collapsible">
-<h4><img src="img/tv.png"/></h4>
+<h4><img src="/img/tv.png"/></h4>
    <div class="ui-grid-a">
       <div class="ui-block-a">
          <button id="btn_ch1">112</button>
@@ -153,28 +153,28 @@
    <div id="popup-msg"></div>
    </div>
 
-<script src="./raspi/script.js"></script>
+<script src="/raspi/script.js"></script>
 <script>
 <!-- navigation buttons-->
 
 $("#btn-pplay").bind("click", function(event, ui){
-   $.get('srv/player/pplay')
+   $.get('/player/pplay')
 })
 
 $("#btn-audio").bind("click", function(event, ui){
-   $.get('srv/player/audio')
+   $.get('/player/audio')
 })
 
 $("#btn-fullscreen").bind("click", function(event, ui){
-   $.get('srv/player/fullscreen')
+   $.get('/player/fullscreen')
 })
 
 $("#btn-forward").bind("click", function(event, ui){
-   $.get('srv/player/forward')
+   $.get('/player/forward')
 })
 
 $("#btn-back").bind("click", function(event, ui){
-   $.get('srv/player/backward')
+   $.get('/player/backward')
 })
 
 <!-- Page section -->
@@ -186,7 +186,7 @@ function initStatus(data){
     updateInfo(data)
     var slider = $('#pos-slider')
     $('#pos-slider').on('slidestop', function(event,ui){
-        $.get('srv/player/seek/' + slider.val())
+        $.get('player/seek/' + slider.val())
     })
 }
 
@@ -207,15 +207,15 @@ function updateInfo(data){
         slider.slider('refresh')
    }
    setTimeout(function(){
-       $.get('srv/player/info',updateInfo);
+       $.get('player/info',updateInfo);
    },1500)
 }
 
 $(document).ready( function(){
    if (document.URL.search('#')==-1){
-      $.get('srv/player/info',initStatus);
+      $.get('player/info',initStatus);
    }
-   $.get('srv/socket/get/17', function(val){
+   $.get('/socket/get/17', function(val){
     if (val == '1')
     {
         $('#flip-s17').prop('checked', true)
@@ -229,30 +229,30 @@ $(document).ready( function(){
     {
         if ($('#flip-s17').is(':checked'))
         {
-            $.get('srv/socket/set/17/1')
+            $.get('/socket/set/17/1')
         }
         else
         {
-            $.get('srv/socket/set/17/0')
+            $.get('/socket/set/17/0')
         }
     })
    })
-    $.get('srv/player/volume/get', function(val){
+    $.get('/player/volume/get', function(val){
 
        var slider = $('#vol-slider')
        slider.val(val)
        slider.slider('refresh')
 
        $('#vol-slider').on('slidestop', function(event,ui){
-           $.get('srv/player/volume/set/' + slider.val())
+           $.get('/player/volume/set/' + slider.val())
        })
 
     })
 
 if (document.URL.search('#browser')!= -1)
-   $.get('srv/browse/', browseHandle)
+   $.get('browse/', browseHandle)
 if (document.URL.search('#system-page')!= -1)
-   $.get('/srv/system/info', updateSystemInfo)
+   $.get('/system/info', updateSystemInfo)
 });
 </script>
 <div data-role="popup" id="playlistPopup" data-theme="b">

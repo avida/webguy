@@ -20,7 +20,6 @@ from youtube import YouTube
 
 mocp = None
 
-
 def makeErrorResponse(msg):
     return json.dumps({'error': str(msg)})
 

@@ -7,7 +7,6 @@ DEV_KEY = "AIzaSyDaMq7oWT-ZSTAGswiNwCLh864QhL9dfUw"
 YOUTUBE_HOST = "content.googleapis.com"
 API_PATH = 'youtube/v3/'
 
-
 class YouTube(ServiceConnection):
 
     def __init__(self):
@@ -18,10 +17,8 @@ class YouTube(ServiceConnection):
                 "maxResults": 5}
         if type:
             vars["type"] = type
-        print(type)
         if token:
             vars["pageToken"] = token
-        print(str(vars))
         url = self.buildUrl("search", vars)
         return json.loads(self.getData(url))
 

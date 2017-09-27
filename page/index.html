@@ -90,7 +90,7 @@ function updateStatus(data){
    $("#player-info").html(f_name + " " +
                           data_struct['position']+'/'+data_struct['duration'])
    setTimeout(function(){
-      $.get('srv/player/playerinfo',updateStatus);
+      $.get('player/info',updateStatus);
    }, 3000)
 }
 
@@ -101,27 +101,27 @@ $("#btn-browse").bind("click", function(event, ui){
       textVisible:true 
       })
 
-   $.get('srv/browse/'+path.join('/'), browseHandle)
+   $.get('browse/'+path.join('/'), browseHandle)
 })
 
 $("#btn-pplay").bind("click", function(event, ui){
-   $.get('srv/player/pplay')
+   $.get('player/pplay')
 })
 
 $("#btn-audio").bind("click", function(event, ui){
-   $.get('srv/player/audio')
+   $.get('player/audio')
 })
 
 $("#btn-fullscreen").bind("click", function(event, ui){
-   $.get('srv/player/fullscreen')
+   $.get('/player/fullscreen')
 })
 
 $("#btn-forward").bind("click", function(event, ui){
-   $.get('srv/player/forward')
+   $.get('player/forward')
 })
 
 $("#btn-back").bind("click", function(event, ui){
-   $.get('srv/player/backward')
+   $.get('player/backward')
 })
 
 var suspendsent = false;
@@ -129,7 +129,7 @@ $("#btn-suspend").bind("click", function(event, ui){
    var val = $(this).html().toLowerCase();
    if (val == 'suspend' && !suspendsent){
 		suspendsent = true
-		$.get('srv/system/suspend');			
+		$.get('system/suspend');			
 	}
 })
 
@@ -150,25 +150,25 @@ $('#lst-dir').on('click', 'li', function(){
    if (item == '..'){
       path.pop()
       $('#lst-dir').empty().listview("refresh")
-      $.get('srv/browse/'+ path.join('/'), browseHandle)
+      $.get('browse/'+ path.join('/'), browseHandle)
       return  
    }
    last_position = $(window).scrollTop()
    if (!isDir){
-      $.get('srv/browse/'+path.join('/')+'/'+item , itemLoaded)
+      $.get('browse/'+path.join('/')+'/'+item , itemLoaded)
    } else {
       var id = title_to_info[item]
       path.push(item)
       $('#lst-dir').empty().listview("refresh")
-      $.get('srv/browse/'+path.join('/'), browseHandle)
+      $.get('browse/'+path.join('/'), browseHandle)
    }
 
 })
 
 $(document).ready( function(){
-$.get('srv/playerinfo',updateStatus);
+$.get('player/info',updateStatus);
 if (document.URL.search('#browser')!= -1)
-   $.get('srv/browse/', browseHandle)
+   $.get('browse/', browseHandle)
 });
 </script>
 </body>
