@@ -17,7 +17,7 @@ logger = logging.getLogger("webguy")
 def socket(socket, action, value = None):
     p = RaspiGPIOOut(socket)
     if action == 'set':
-        p.setValue(value == "1")
+        p.setValue(value == 1)
         return "ok"
     elif action == 'switch':
         value = p.getValue()
