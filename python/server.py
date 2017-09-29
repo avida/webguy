@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-import tornado.ioloop
-import tornado.web
 import sys
+import logging
 from plumbum import cli
 from flask_socketio import SocketIO
 
@@ -19,7 +18,9 @@ class ServerApplication(cli.Application):
             from flask_raspi import app
         socketio = SocketIO(app)
         socketio.run(app, host="0.0.0.0", port=80)
-        print ("Hello")
+
+log = logging.getLogger('werkzeug')
+#log.setLevel(logging.ERROR)
     
 ServerApplication.run()
 # vim: ts=4 sw=4 et

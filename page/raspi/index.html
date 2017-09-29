@@ -186,7 +186,7 @@ function initStatus(data){
     updateInfo(data)
     var slider = $('#pos-slider')
     $('#pos-slider').on('slidestop', function(event,ui){
-        $.get('player/seek/' + slider.val())
+        $.get('/player/seek/' + slider.val())
     })
 }
 
@@ -207,15 +207,15 @@ function updateInfo(data){
         slider.slider('refresh')
    }
    setTimeout(function(){
-       $.get('player/info',updateInfo);
+       $.get('/player/info',updateInfo);
    },1500)
 }
 
 $(document).ready( function(){
    if (document.URL.search('#')==-1){
-      $.get('player/info',initStatus);
+      $.get('/player/info',initStatus);
    }
-   $.get('/socket/get/17', function(val){
+   $.get('/socket/17/get', function(val){
     if (val == '1')
     {
         $('#flip-s17').prop('checked', true)
@@ -229,11 +229,11 @@ $(document).ready( function(){
     {
         if ($('#flip-s17').is(':checked'))
         {
-            $.get('/socket/set/17/1')
+            $.get('/socket/17/set/1')
         }
         else
         {
-            $.get('/socket/set/17/0')
+            $.get('/socket/17/set/0')
         }
     })
    })

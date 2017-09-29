@@ -150,23 +150,23 @@ $('#lst-dir').on('click', 'li', function(){
    if (item == '..'){
       path.pop()
       $('#lst-dir').empty().listview("refresh")
-      $.get('browse/'+ path.join('/'), browseHandle)
+      $.get('/browse/'+ path.join('/'), browseHandle)
       return  
    }
    last_position = $(window).scrollTop()
    if (!isDir){
-      $.get('browse/'+path.join('/')+'/'+item , itemLoaded)
+      $.get('/browse/'+path.join('/')+'/'+item , itemLoaded)
    } else {
       var id = title_to_info[item]
       path.push(item)
       $('#lst-dir').empty().listview("refresh")
-      $.get('browse/'+path.join('/'), browseHandle)
+      $.get('/browse/'+path.join('/'), browseHandle)
    }
 
 })
 
 $(document).ready( function(){
-$.get('player/info',updateStatus);
+$.get('/player/info',updateStatus);
 if (document.URL.search('#browser')!= -1)
    $.get('browse/', browseHandle)
 });

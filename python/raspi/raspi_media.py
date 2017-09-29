@@ -24,7 +24,7 @@ def browseRadio(number):
 @app.route("/radio/play/<int:station>")
 @ConnectionRefusedHandler
 def playStation(station):
-    station_info = self.dirble.getStationInfo(station )
+    station_info = dirble.getStationInfo(station )
     if len(station_info["streams"]) > 0:
         stream = station_info["streams"][0]["stream"]
         xbmc.Open(stream)
@@ -56,6 +56,7 @@ def radioVolume(action):
 
 @app.route("/volume/set/<int:value>")
 def radioSetVolume(value):
+    print("volume")
     MOCP.setVolume(value)
     return 'ok'
 
@@ -89,6 +90,7 @@ def playerAction(action, value = None):
         return json.dumps(js)
     else:
         abort(404)
+    return "ok"
 
 @app.route("/player/volume/<string:action>")
 @app.route("/player/volume/<string:action>/<int:value>")

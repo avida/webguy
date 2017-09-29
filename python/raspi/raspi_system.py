@@ -7,8 +7,11 @@ import urllib.parse
 import html
 import os
 import pathlib
+import json
+import logging
 xbmc = XBMC()
 
+logger = logging.getLogger("webguy")
 @app.route("/socket/<int:socket>/<string:action>")
 @app.route("/socket/<int:socket>/<string:action>/<int:value>")
 def socket(socket, action, value = None):
@@ -28,7 +31,7 @@ def socket(socket, action, value = None):
 @app.route("/music/<string:path>")
 @ConnectionRefusedHandler
 def musicBrowse(path =  './'):
-    browser = FileBrowser('./')
+    browser = FileBrowser('/mnt/music')
     path = urllib.parse.unquote('/'.join(path))
     path = html.unescape(browser.dir_path + '/' + path)
     type = 'directory'
@@ -43,7 +46,7 @@ def musicBrowse(path =  './'):
     try:
         path = urllib.parse.unquote('/'.join(params))
         path = html.unescape(path)
-        return self.processItemOnFS(path)
+        return browser.processItemOnFS(path)
     except FileBrowser.NotADirException:
         return "not a dir"
 
@@ -51,14 +54,17 @@ def musicBrowse(path =  './'):
 @app.route("/browse/<path:path>")
 @ConnectionRefusedHandler
 def fsBrowse(path = './'):
-    browser = FileBrowser('./')
+    browser = FileBrowser('/mnt/nfs/')
+    logger.warning("sdf")
     try:
         path = html.unescape(path)
         return browser.processItemOnFS(path)
     except AttributeError:
+        logger.warning("Attribute error")
         pass
     except FileBrowser.NotADirException:
         path = os.path.normpath(browser.dir_path + '/' + path)
+        logger.warning("Not a dir")
         print(path)
         xbmc.Open(path)
     return "ok"
@@ -67,7 +73,7 @@ def fsBrowse(path = './'):
 @ConnectionRefusedHandler
 def systemAction(action):
 
-    def GetSystemInfo(self):
+    def GetSystemInfo():
         info = {}
         info["uptime"] = str(SystemUptime())
         return info
@@ -77,8 +83,9 @@ def systemAction(action):
     elif action == 'analog':
         xbmc.SetAudioDevice('PI:Analogue')
     elif action == 'info':
-        return GetSystemInfo()
+        return json.dumps(GetSystemInfo())
     else:
         abort(404)
+    return "ok"
 
     

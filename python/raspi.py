@@ -99,7 +99,7 @@ class BrowserHanlder(FileBrowser):
 
     def __init__(self, app):
         self.app = app
-        FileBrowser.__init__(self, '/mnt/nfs')
+        FileBrowser.__init__(self, '/mnt/nfs/')
 
     def __call__(self, params, **kwargs):
         try:
