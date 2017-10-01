@@ -121,7 +121,7 @@ $('#lst-dir').on('click', 'li', function(){
    last_position = $(window).scrollTop()
    if (!isDir){
       var filename = this.getAttribute('filename')
-      $.get('/browse/'+path.join('/')+'/'+filename , itemLoaded)
+      $.get(['/browse', path.join('/'), filename].filter(function(val){return val != ''}).join('/') , itemLoaded)
    } else {
       var id = title_to_info[item]
       path.push(item)
