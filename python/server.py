@@ -16,6 +16,8 @@ class ServerApplication(cli.Application):
             print ("rapsi")
             sys.path.append("raspi")
             from flask_raspi import app
+        from serial_listener import startListen
+        startListen()
         socketio = SocketIO(app)
         socketio.run(app, host="0.0.0.0", port=80)
 

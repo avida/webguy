@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+# sudo pip3 install pySerial
 import serial
 import threading
 import time
@@ -40,19 +41,19 @@ class CommandProcessor:
 
     def processFunc(self, cmd):
         if 'ff000f' in cmd:
-            self.sendRequest("/srv/socket/switch/17")
+            self.sendRequest("/socket/17/switch")
             return 5
         elif '6509af' in cmd:
-            self.sendRequest("/srv/player/forward")
+            self.sendRequest("/player/forward")
             return 1
         elif 'd002ff' in cmd:
-            self.sendRequest("/srv/player/pplay")
+            self.sendRequest("/player/pplay")
             return 1
         elif 'e501af' in cmd:
-            self.sendRequest("/srv/player/backward")
+            self.sendRequest("/player/backward")
             return 1
         elif '9f060f' in cmd:
-            self.sendRequest("/srv/radio/stop")
+            self.sendRequest("/radio/stop")
         return 0
 
 
