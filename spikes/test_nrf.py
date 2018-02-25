@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 from nrf24 import NRF24
 import time
 from functools import reduce
@@ -19,39 +20,60 @@ radio.startListening()
 
 radio.printDetails()
 
-def nrfWrite():
-    while(True):
-        radio.write("2" * 8)
 packet = 0
-def nrfRead():
-    def cntr():
-        global packet
-        while(True):
-            time.sleep(1)
-            print("packets: {}".format( packet ))
-            packet = 0
-    t = Thread(target=cntr) 
-    global packet
-    t.start()
+
+def nrfWrite():
+    radio.retries = 1
+    radio.stopListening()
+    global packet 
     while(True):
-        while not radio.available([0], True):
+        if radio.write("2" * 8):
+            packet += 1
+        else:
+            print("failed")
+        print(radio.get_status())
+        time.sleep(.001)
+
+
+def nrfRead():
+   global packet
+   while(True):
+        while not radio.available([0], False):
             time.sleep(0.001)
         recv_buff = []
         time.sleep(0.002)
         radio.read(recv_buff)
+        print("received packet: " +  str(recv_buff))
+
         packet += 1
 
 def pingpong():
+    global packet
     while(True):
-        while not radio.available([0], True):
-            pass
-        print("recv")
+        while not radio.available([0], False):
+            time.sleep(0.001)
+        #print("recv")
+        packet += 1
         recv_buff = []
         radio.read(recv_buff)
         radio.stopListening()
-        radio.write("Pong")
+        retry = 0
+        while not radio.write("PONG"):
+            #print("retry")
+            retry += 1
         radio.startListening()
 
-pingpong()
+def cntr():
+    global packet
+    while(True):
+        time.sleep(1)
+        print("packets: {}".format( packet ))
+        packet = 0
+t = Thread(target=cntr) 
+#t.start()
+
+#pingpong()
+nrfRead()
+#nrfWrite()
 
 
