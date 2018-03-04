@@ -3,6 +3,7 @@
 import logging
 import random
 import time
+from itertools import product
 from plumbum import cli
 from timebox import Timebox, Image
 
@@ -29,23 +30,20 @@ class App(cli.Application):
                 return
             device.send_raw(self.data)
         elif operation == "image":
+            cntr = 11
             while True:
                 img = Image()
                 #img.fillImage(0,0,15)
-                """
-                img.fillImage(
-                random.randint(0,15),
-                random.randint(0,15),
-                random.randint(0,15))
-                """
-                img.setPixel(
-                random.randint(0,10),
-                random.randint(0,10),
-                0,15,0)
-                #data =  random.sample(range(0,256), 182)
+                for x,y in product(range(0,11), range(0,11)):
+                    g = (x + cntr) % 22
+                    g = g if g < 11 else 22 - g
+                    img.setPixel(
+                    x, y,
+                    0,g,5)
                 data = img.data
                 device.sendImage(data)
                 time.sleep(.2)
+                cntr+=1
 
         time.sleep(74)
 

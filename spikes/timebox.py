@@ -56,7 +56,7 @@ class Image:
         #logger.info("index: {}, first: {}".format(index, first))
         if first:
             self.data[index] = r + (g << 4)
-            self.data[index+1] = self.data[index+1]&0xf0 + b
+            self.data[index+1] = (self.data[index+1]&0xf0) + b
         else:
             self.data[index] = (self.data[index]&0x0f) + (r<<4)
             self.data[index+1] = g + (b<<4)
