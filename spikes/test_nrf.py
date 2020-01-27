@@ -1,9 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from nrf24 import NRF24
 import time
 from functools import reduce
 from threading import Thread
+import struct
 
 radio = NRF24()
 radio.begin(0, 0, 17, 2)
@@ -15,10 +16,12 @@ radio.write_register(NRF24.RF_SETUP, 0xf)
 radio.write_register(NRF24.EN_RXADDR, 0x3)
 
 radio.openReadingPipe(0, [0xe7, 0xe7, 0xe7, 0xe7, 0xe7])
+radio.openWritingPipe([0xe7, 0xe7, 0xe7, 0xe7, 0xe7])
 
 radio.startListening()
 
 radio.printDetails()
+# exit(0)
 
 packet = 0
 
@@ -46,8 +49,24 @@ def nrfRead():
         """
         recv_buff = []
         radio.read(recv_buff)
-        print("received packet: " + str(recv_buff))
+        pkt = struct.unpack("BBhI", bytes(recv_buff))
+        print("received packet: " + str(pkt))
         packet += 1
+
+def send_packet():
+        radio.stopListening()
+        cnt = 1
+        pkt = struct.pack("BBhI", 42, cnt, 2, 34)
+        while not radio.write(pkt):
+            print("resending")
+            print(radio.get_status())
+            time.sleep(1)
+            print(radio.get_status())
+            cnt +=1
+            pkt = struct.pack("BBhI", 42, cnt, 2, 34)
+        print("Packet sent")
+        print(radio.get_status())
+        time.sleep(1)
 
 
 def pingpong():
@@ -76,8 +95,9 @@ def cntr():
 
 
 t = Thread(target=cntr)
-# t.start()
+#t.start()
 
 # pingpong()
-nrfRead()
+#nrfRead()
 # nrfWrite()
+send_packet()

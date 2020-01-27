@@ -1,0 +1,10 @@
+[Unit]
+Description=Serivce to listen redis for nrf commands
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/.pyenv/versions/37/bin/python3 /home/pi/webguy/services/nrf/nrf_service.py
+
+[Install]
+WantedBy=multi-user.target
